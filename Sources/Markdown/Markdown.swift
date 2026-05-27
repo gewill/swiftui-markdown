@@ -4,7 +4,7 @@ import WebKit
 #if os(OSX)
     import AppKit
     public typealias ViewRepresentable = NSViewRepresentable
-#elseif os(iOS)
+#else
     import UIKit
     public typealias ViewRepresentable = UIViewRepresentable
 #endif
@@ -19,7 +19,6 @@ public struct Markdown: ViewRepresentable {
 
     public init(content: Binding<String>) {
         self._content = content
-        self.theme = colorScheme
     }
     public init(content: Binding<String>, theme: ColorScheme?) {
         self._content = content
