@@ -25,11 +25,23 @@
 		7D6033CA27DB2A4B00F7B36B /* ToDoGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D6033C827DB2A4A00F7B36B /* ToDoGroup.swift */; };
 		7D65F3012C047F01001F0A11 /* FontStyleGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D65F3002C047F01001F0A11 /* FontStyleGroup.swift */; };
 		7D65F3022C047F01001F0A11 /* FontStyleGroup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D65F3002C047F01001F0A11 /* FontStyleGroup.swift */; };
-		7D65F3052C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3042C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf */; };
-		7D65F3062C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3042C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf */; };
-		7D65F3092C0487A5001F0A11 /* Merriweather-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3072C0487A5001F0A11 /* Merriweather-Regular.ttf */; };
-		7D65F30A2C0487A5001F0A11 /* Merriweather-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3072C0487A5001F0A11 /* Merriweather-Regular.ttf */; };
-		7D6AF8C327D9DF2300EE5204 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D6AF8B327D9DF2200EE5204 /* ExampleApp.swift */; };
+			7D65F3052C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3042C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf */; };
+			7D65F3062C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3042C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf */; };
+			7D65F3092C0487A5001F0A11 /* Merriweather-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3072C0487A5001F0A11 /* Merriweather-Regular.ttf */; };
+			7D65F30A2C0487A5001F0A11 /* Merriweather-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3072C0487A5001F0A11 /* Merriweather-Regular.ttf */; };
+			7D65F30D2C0491F2001F0A11 /* AtkinsonHyperlegible-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F30C2C0491F2001F0A11 /* AtkinsonHyperlegible-Bold.ttf */; };
+			7D65F30E2C0491F2001F0A11 /* AtkinsonHyperlegible-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F30C2C0491F2001F0A11 /* AtkinsonHyperlegible-Bold.ttf */; };
+			7D65F3102C0491F2001F0A11 /* AtkinsonHyperlegible-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F30F2C0491F2001F0A11 /* AtkinsonHyperlegible-Italic.ttf */; };
+			7D65F3112C0491F2001F0A11 /* AtkinsonHyperlegible-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F30F2C0491F2001F0A11 /* AtkinsonHyperlegible-Italic.ttf */; };
+			7D65F3132C0491F2001F0A11 /* AtkinsonHyperlegible-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3122C0491F2001F0A11 /* AtkinsonHyperlegible-BoldItalic.ttf */; };
+			7D65F3142C0491F2001F0A11 /* AtkinsonHyperlegible-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3122C0491F2001F0A11 /* AtkinsonHyperlegible-BoldItalic.ttf */; };
+			7D65F3162C0491F2001F0A11 /* Merriweather-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3152C0491F2001F0A11 /* Merriweather-Bold.ttf */; };
+			7D65F3172C0491F2001F0A11 /* Merriweather-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3152C0491F2001F0A11 /* Merriweather-Bold.ttf */; };
+			7D65F3192C0491F2001F0A11 /* Merriweather-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3182C0491F2001F0A11 /* Merriweather-Italic.ttf */; };
+			7D65F31A2C0491F2001F0A11 /* Merriweather-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F3182C0491F2001F0A11 /* Merriweather-Italic.ttf */; };
+			7D65F31C2C0491F2001F0A11 /* Merriweather-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F31B2C0491F2001F0A11 /* Merriweather-BoldItalic.ttf */; };
+			7D65F31D2C0491F2001F0A11 /* Merriweather-BoldItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7D65F31B2C0491F2001F0A11 /* Merriweather-BoldItalic.ttf */; };
+			7D6AF8C327D9DF2300EE5204 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D6AF8B327D9DF2200EE5204 /* ExampleApp.swift */; };
 		7D6AF8C427D9DF2300EE5204 /* ExampleApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D6AF8B327D9DF2200EE5204 /* ExampleApp.swift */; };
 		7D6AF8C727D9DF2300EE5204 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7D6AF8B527D9DF2300EE5204 /* Assets.xcassets */; };
 		7D6AF8C827D9DF2300EE5204 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 7D6AF8B527D9DF2300EE5204 /* Assets.xcassets */; };
@@ -50,11 +62,17 @@
 		7D6033C527DAF1D900F7B36B /* BaseMarkdownGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseMarkdownGroup.swift; sourceTree = "<group>"; };
 		7D6033C827DB2A4A00F7B36B /* ToDoGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoGroup.swift; sourceTree = "<group>"; };
 		7D65F3002C047F01001F0A11 /* FontStyleGroup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontStyleGroup.swift; sourceTree = "<group>"; };
-		7D65F3042C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Regular.ttf"; sourceTree = "<group>"; };
-		7D65F3072C0487A5001F0A11 /* Merriweather-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Merriweather-Regular.ttf"; sourceTree = "<group>"; };
-		7D65F3082C0487A5001F0A11 /* AtkinsonHyperlegible-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "AtkinsonHyperlegible-OFL.txt"; sourceTree = "<group>"; };
-		7D65F30B2C0487A5001F0A11 /* Merriweather-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Merriweather-OFL.txt"; sourceTree = "<group>"; };
-		7D6AF8B327D9DF2200EE5204 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
+			7D65F3042C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Regular.ttf"; sourceTree = "<group>"; };
+			7D65F3072C0487A5001F0A11 /* Merriweather-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Merriweather-Regular.ttf"; sourceTree = "<group>"; };
+			7D65F3082C0487A5001F0A11 /* AtkinsonHyperlegible-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "AtkinsonHyperlegible-OFL.txt"; sourceTree = "<group>"; };
+			7D65F30B2C0487A5001F0A11 /* Merriweather-OFL.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Merriweather-OFL.txt"; sourceTree = "<group>"; };
+			7D65F30C2C0491F2001F0A11 /* AtkinsonHyperlegible-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Bold.ttf"; sourceTree = "<group>"; };
+			7D65F30F2C0491F2001F0A11 /* AtkinsonHyperlegible-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-Italic.ttf"; sourceTree = "<group>"; };
+			7D65F3122C0491F2001F0A11 /* AtkinsonHyperlegible-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AtkinsonHyperlegible-BoldItalic.ttf"; sourceTree = "<group>"; };
+			7D65F3152C0491F2001F0A11 /* Merriweather-Bold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Merriweather-Bold.ttf"; sourceTree = "<group>"; };
+			7D65F3182C0491F2001F0A11 /* Merriweather-Italic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Merriweather-Italic.ttf"; sourceTree = "<group>"; };
+			7D65F31B2C0491F2001F0A11 /* Merriweather-BoldItalic.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Merriweather-BoldItalic.ttf"; sourceTree = "<group>"; };
+			7D6AF8B327D9DF2200EE5204 /* ExampleApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExampleApp.swift; sourceTree = "<group>"; };
 		7D6AF8B527D9DF2300EE5204 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		7D6AF8BA27D9DF2300EE5204 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7D6AF8C027D9DF2300EE5204 /* Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -103,7 +121,13 @@
 			isa = PBXGroup;
 			children = (
 				7D65F3042C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf */,
+				7D65F30C2C0491F2001F0A11 /* AtkinsonHyperlegible-Bold.ttf */,
+				7D65F30F2C0491F2001F0A11 /* AtkinsonHyperlegible-Italic.ttf */,
+				7D65F3122C0491F2001F0A11 /* AtkinsonHyperlegible-BoldItalic.ttf */,
 				7D65F3072C0487A5001F0A11 /* Merriweather-Regular.ttf */,
+				7D65F3152C0491F2001F0A11 /* Merriweather-Bold.ttf */,
+				7D65F3182C0491F2001F0A11 /* Merriweather-Italic.ttf */,
+				7D65F31B2C0491F2001F0A11 /* Merriweather-BoldItalic.ttf */,
 				7D65F3082C0487A5001F0A11 /* AtkinsonHyperlegible-OFL.txt */,
 				7D65F30B2C0487A5001F0A11 /* Merriweather-OFL.txt */,
 			);
@@ -253,7 +277,13 @@
 			files = (
 				7D6AF8C727D9DF2300EE5204 /* Assets.xcassets in Resources */,
 				7D65F3052C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf in Resources */,
+				7D65F30D2C0491F2001F0A11 /* AtkinsonHyperlegible-Bold.ttf in Resources */,
+				7D65F3102C0491F2001F0A11 /* AtkinsonHyperlegible-Italic.ttf in Resources */,
+				7D65F3132C0491F2001F0A11 /* AtkinsonHyperlegible-BoldItalic.ttf in Resources */,
 				7D65F3092C0487A5001F0A11 /* Merriweather-Regular.ttf in Resources */,
+				7D65F3162C0491F2001F0A11 /* Merriweather-Bold.ttf in Resources */,
+				7D65F3192C0491F2001F0A11 /* Merriweather-Italic.ttf in Resources */,
+				7D65F31C2C0491F2001F0A11 /* Merriweather-BoldItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -263,7 +293,13 @@
 			files = (
 				7D6AF8C827D9DF2300EE5204 /* Assets.xcassets in Resources */,
 				7D65F3062C047F01001F0A11 /* AtkinsonHyperlegible-Regular.ttf in Resources */,
+				7D65F30E2C0491F2001F0A11 /* AtkinsonHyperlegible-Bold.ttf in Resources */,
+				7D65F3112C0491F2001F0A11 /* AtkinsonHyperlegible-Italic.ttf in Resources */,
+				7D65F3142C0491F2001F0A11 /* AtkinsonHyperlegible-BoldItalic.ttf in Resources */,
 				7D65F30A2C0487A5001F0A11 /* Merriweather-Regular.ttf in Resources */,
+				7D65F3172C0491F2001F0A11 /* Merriweather-Bold.ttf in Resources */,
+				7D65F31A2C0491F2001F0A11 /* Merriweather-Italic.ttf in Resources */,
+				7D65F31D2C0491F2001F0A11 /* Merriweather-BoldItalic.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

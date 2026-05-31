@@ -6,6 +6,8 @@
 
 - 系统字体栈能正确写入 CSS variables。
 - app 内嵌字体能通过 `@font-face` 注入并被 WebView 使用。
+- 只传 Regular face 时保持兼容，传 4 个 static face 时匹配 Markdown
+  常用的 normal、bold、italic、bold italic。
 - 字体切换不会破坏 Markdown 渲染、代码块字体、KaTeX、暗色模式和跨平台构建。
 - Example 能作为可视化验收入口。
 
@@ -41,6 +43,12 @@ swift test
   - `src: url('data:font/ttf;base64,...')`
   - `font-weight`
   - `font-style`
+- `testStyleBuildsStaticMarkdownFontFamilyFaces`
+  - 同一 `fontFamily` 生成 4 个 `@font-face`
+  - `400 normal`
+  - `700 normal`
+  - `400 italic`
+  - `700 italic`
 
 建议后续补充：
 
@@ -75,7 +83,13 @@ xcodebuild \
 
 - 两个 target 都能编译通过。
 - 构建日志中复制 `AtkinsonHyperlegible-Regular.ttf`。
+- 构建日志中复制 `AtkinsonHyperlegible-Bold.ttf`。
+- 构建日志中复制 `AtkinsonHyperlegible-Italic.ttf`。
+- 构建日志中复制 `AtkinsonHyperlegible-BoldItalic.ttf`。
 - 构建日志中复制 `Merriweather-Regular.ttf`。
+- 构建日志中复制 `Merriweather-Bold.ttf`。
+- 构建日志中复制 `Merriweather-Italic.ttf`。
+- 构建日志中复制 `Merriweather-BoldItalic.ttf`。
 - 构建日志中没有复制旧的 `KaTeX_Typewriter-Regular.ttf` 到 Example app。
 
 ### 格式检查
@@ -148,6 +162,15 @@ app 字体选项预期包含：
 src: url('data:font/ttf;base64,
 ```
 
+4-face app 字体选项还应包含：
+
+```css
+font-weight: 400; font-style: normal;
+font-weight: 700; font-style: normal;
+font-weight: 400; font-style: italic;
+font-weight: 700; font-style: italic;
+```
+
 系统字体选项预期不包含 `@font-face`。
 
 ## 手工视觉矩阵
@@ -162,6 +185,7 @@ src: url('data:font/ttf;base64,
 | 系统 Mono | 选择 `System Mono` | 正文和代码块都呈 monospace |
 | App Atkinson | 选择 `App Atkinson` | 字形与系统字体明显不同，字母辨识度高 |
 | App Merriweather | 选择 `App Merriweather` | 正文呈屏幕阅读 serif 风格 |
+| App 4-face | 查看 normal/bold/italic/bold italic 示例句 | 粗体、斜体、粗斜体都有真实 face 匹配 |
 
 ### Markdown 内容
 
@@ -207,8 +231,14 @@ find Example/Shared/Fonts -maxdepth 1 -type f -print | sort
 必须包含：
 
 - `AtkinsonHyperlegible-Regular.ttf`
+- `AtkinsonHyperlegible-Bold.ttf`
+- `AtkinsonHyperlegible-Italic.ttf`
+- `AtkinsonHyperlegible-BoldItalic.ttf`
 - `AtkinsonHyperlegible-OFL.txt`
 - `Merriweather-Regular.ttf`
+- `Merriweather-Bold.ttf`
+- `Merriweather-Italic.ttf`
+- `Merriweather-BoldItalic.ttf`
 - `Merriweather-OFL.txt`
 
 授权验收：
@@ -238,5 +268,6 @@ find Example/Shared/Fonts -maxdepth 1 -type f -print | sort
 - [ ] `App Merriweather` computed font 包含 `Merriweather Demo`。
 - [ ] 系统字体选项不生成 `@font-face`。
 - [ ] app 字体选项生成 data URL `@font-face`。
+- [ ] app 字体选项生成 4 个 face：`400 normal`、`700 normal`、`400 italic`、`700 italic`。
 - [ ] KaTeX 页面公式渲染正常。
 - [ ] OFL 文本随字体文件保留。

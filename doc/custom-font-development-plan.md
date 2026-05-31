@@ -17,6 +17,7 @@
 | 7 | 运行包构建和测试验证 | 已完成 |
 | 8 | 增加真实字体视觉示例 | 已完成 |
 | 9 | 整理高覆盖测试文档 | 已完成 |
+| 10 | 支持 Markdown 常用 4-face static 字体族示例和测试 | 已完成 |
 
 ## API 形态
 
@@ -50,6 +51,42 @@ MarkdownStyle(
 )
 ```
 
+只提供 Regular face 是有效配置。缺少 Bold、Italic 或 BoldItalic 时，
+WebKit 会按 CSS fallback 规则合成或回退；提供 4 个 face 时，Markdown
+的粗体、斜体、粗斜体会匹配真实字体文件。
+
+```swift
+MarkdownStyle(
+    fontFamily: "'Merriweather', Georgia, serif",
+    fontFaces: [
+        MarkdownFontFace(
+            fontFamily: "Merriweather",
+            source: .appResource(name: "Merriweather-Regular", fileExtension: "ttf", bundleIdentifier: nil),
+            fontWeight: "400",
+            fontStyle: "normal"
+        ),
+        MarkdownFontFace(
+            fontFamily: "Merriweather",
+            source: .appResource(name: "Merriweather-Bold", fileExtension: "ttf", bundleIdentifier: nil),
+            fontWeight: "700",
+            fontStyle: "normal"
+        ),
+        MarkdownFontFace(
+            fontFamily: "Merriweather",
+            source: .appResource(name: "Merriweather-Italic", fileExtension: "ttf", bundleIdentifier: nil),
+            fontWeight: "400",
+            fontStyle: "italic"
+        ),
+        MarkdownFontFace(
+            fontFamily: "Merriweather",
+            source: .appResource(name: "Merriweather-BoldItalic", fileExtension: "ttf", bundleIdentifier: nil),
+            fontWeight: "700",
+            fontStyle: "italic"
+        )
+    ]
+)
+```
+
 `bundleIdentifier: nil` 表示使用 `Bundle.main`。字体放在 framework bundle
 时传入对应 bundle identifier。
 
@@ -61,5 +98,6 @@ MarkdownStyle(
 
 - 系统字体：Georgia、Avenir Next、Menlo，用来展示 Serif、Rounded Sans 和 Mono
   三类辨识度明显的系统字体栈。
-- app 内嵌字体：Atkinson Hyperlegible、Merriweather。字体文件和对应 OFL 文本
-  位于 `Example/Shared/Fonts/`。
+- app 内嵌字体：Atkinson Hyperlegible、Merriweather。示例提供
+  Regular、Bold、Italic、BoldItalic 四个 static face，字体文件和对应 OFL
+  文本位于 `Example/Shared/Fonts/`。

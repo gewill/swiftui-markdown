@@ -137,6 +137,8 @@ Markdown(content: $mdStr)
 
 Fonts imported by the host app can be exposed to the Markdown WebView with
 `@font-face`. Use the same `fontFamily` name in the body font stack.
+Passing one regular face is valid; Markdown bold and italic will fall back to
+WebKit synthesis when matching faces are not provided.
 
 ```swift
 Markdown(content: $mdStr)
@@ -157,9 +159,48 @@ Markdown(content: $mdStr)
   )
 ```
 
+For Markdown documents, provide regular, bold, italic, and bold italic faces
+when you want `**strong**`, `*emphasis*`, and `***strong emphasis***` to use
+real font files.
+
+```swift
+Markdown(content: $mdStr)
+  .markdownStyle(
+    MarkdownStyle(
+      fontFamily: "'Merriweather', Georgia, serif",
+      fontFaces: [
+        MarkdownFontFace(
+          fontFamily: "Merriweather",
+          source: .appResource(name: "Merriweather-Regular", fileExtension: "ttf", bundleIdentifier: nil),
+          fontWeight: "400",
+          fontStyle: "normal"
+        ),
+        MarkdownFontFace(
+          fontFamily: "Merriweather",
+          source: .appResource(name: "Merriweather-Bold", fileExtension: "ttf", bundleIdentifier: nil),
+          fontWeight: "700",
+          fontStyle: "normal"
+        ),
+        MarkdownFontFace(
+          fontFamily: "Merriweather",
+          source: .appResource(name: "Merriweather-Italic", fileExtension: "ttf", bundleIdentifier: nil),
+          fontWeight: "400",
+          fontStyle: "italic"
+        ),
+        MarkdownFontFace(
+          fontFamily: "Merriweather",
+          source: .appResource(name: "Merriweather-BoldItalic", fileExtension: "ttf", bundleIdentifier: nil),
+          fontWeight: "700",
+          fontStyle: "italic"
+        )
+      ]
+    )
+  )
+```
+
 The example app includes a `Fonts` page that switches between the default
 Markdown style, several named system font stacks, and app-bundled Atkinson
-Hyperlegible / Merriweather font files copied into the app bundle.
+Hyperlegible / Merriweather static font families copied into the app bundle.
 
 ## Configure
 

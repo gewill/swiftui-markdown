@@ -20,8 +20,11 @@ struct FontStyleGroup: View {
     Custom fonts should keep headings, body copy, lists, and code blocks
     visually distinct while preserving the Markdown layout.
 
+    Normal text, **bold text**, *italic text*, and ***bold italic text***
+    should use the matching face when the app bundles it.
+
     - System stack: uses fonts already available to WebKit.
-    - App bundled font: loads a font file copied into the example app bundle.
+    - App bundled font: loads regular, bold, italic, and bold italic files.
     - Code font: can use an independent monospace stack.
 
     ```swift
@@ -98,9 +101,9 @@ private enum FontDemo: String, CaseIterable, Identifiable {
         case .systemMono:
             return "Menlo for body and code"
         case .appAtkinson:
-            return "Atkinson Hyperlegible loaded from Bundle.main"
+            return "Atkinson Hyperlegible 4-face static family"
         case .appMerriweather:
-            return "Merriweather loaded from Bundle.main"
+            return "Merriweather 4-face static family"
         }
     }
 
@@ -139,18 +142,13 @@ private enum FontDemo: String, CaseIterable, Identifiable {
                 fontSize: 17,
                 lineHeight: 1.65,
                 codeFontFamily: "\"SF Mono\", Menlo, monospace",
-                fontFaces: [
-                    MarkdownFontFace(
-                        fontFamily: "Atkinson Hyperlegible Demo",
-                        source: .appResource(
-                            name: "AtkinsonHyperlegible-Regular",
-                            fileExtension: "ttf",
-                            bundleIdentifier: nil
-                        ),
-                        fontWeight: "400",
-                        fontStyle: "normal"
-                    )
-                ]
+                fontFaces: Self.staticFaces(
+                    family: "Atkinson Hyperlegible Demo",
+                    regular: "AtkinsonHyperlegible-Regular",
+                    bold: "AtkinsonHyperlegible-Bold",
+                    italic: "AtkinsonHyperlegible-Italic",
+                    boldItalic: "AtkinsonHyperlegible-BoldItalic"
+                )
             )
         case .appMerriweather:
             return MarkdownStyle(
@@ -159,20 +157,48 @@ private enum FontDemo: String, CaseIterable, Identifiable {
                 fontSize: 17,
                 lineHeight: 1.75,
                 codeFontFamily: "\"SF Mono\", Menlo, monospace",
-                fontFaces: [
-                    MarkdownFontFace(
-                        fontFamily: "Merriweather Demo",
-                        source: .appResource(
-                            name: "Merriweather-Regular",
-                            fileExtension: "ttf",
-                            bundleIdentifier: nil
-                        ),
-                        fontWeight: "400",
-                        fontStyle: "normal"
-                    )
-                ]
+                fontFaces: Self.staticFaces(
+                    family: "Merriweather Demo",
+                    regular: "Merriweather-Regular",
+                    bold: "Merriweather-Bold",
+                    italic: "Merriweather-Italic",
+                    boldItalic: "Merriweather-BoldItalic"
+                )
             )
         }
+    }
+
+    private static func staticFaces(
+        family: String,
+        regular: String,
+        bold: String,
+        italic: String,
+        boldItalic: String
+    ) -> [MarkdownFontFace] {
+        [
+            fontFace(family: family, name: regular, weight: "400", style: "normal"),
+            fontFace(family: family, name: bold, weight: "700", style: "normal"),
+            fontFace(family: family, name: italic, weight: "400", style: "italic"),
+            fontFace(family: family, name: boldItalic, weight: "700", style: "italic")
+        ]
+    }
+
+    private static func fontFace(
+        family: String,
+        name: String,
+        weight: String,
+        style: String
+    ) -> MarkdownFontFace {
+        MarkdownFontFace(
+            fontFamily: family,
+            source: .appResource(
+                name: name,
+                fileExtension: "ttf",
+                bundleIdentifier: nil
+            ),
+            fontWeight: weight,
+            fontStyle: style
+        )
     }
 }
 
