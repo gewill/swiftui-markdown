@@ -26,26 +26,12 @@ public struct Markdown: ViewRepresentable {
     }
     
     public func makeCoordinator() -> Coordinator {
-        return Coordinator(content: $content, colorScheme: colorScheme)
+        return Coordinator(content: $content, colorScheme: colorScheme, style: style)
     }
     private func getWebView(context: Context) -> MarkdownWebView {
         let codeView = MarkdownWebView()
         codeView.setContent(content)
-        if (style.padding != nil) {
-            codeView.setPadding(style.padding!)
-        }
-        if (style.paddingTop != nil) {
-            codeView.setPaddingTop(style.paddingTop!)
-        }
-        if (style.paddingBottom != nil) {
-            codeView.setPaddingBottom(style.paddingBottom!)
-        }
-        if (style.paddingLeft != nil) {
-            codeView.setPaddingLeft(style.paddingLeft!)
-        }
-        if (style.paddingRight != nil) {
-            codeView.setPaddingRight(style.paddingRight!)
-        }
+        codeView.setMarkdownStyle(style)
         codeView.textDidChanged = { text in
             context.coordinator.set(content: text)
         }
@@ -60,6 +46,10 @@ public struct Markdown: ViewRepresentable {
         }
         if context.coordinator.content != content {
             webview.setContent(content)
+        }
+        if context.coordinator.style != style {
+            webview.setMarkdownStyle(style)
+            context.coordinator.set(style: style)
         }
     }
     // MARK: macOS
@@ -91,10 +81,12 @@ public extension Markdown {
     class Coordinator: NSObject {
         @Binding private(set) var content: String
         private(set) var colorScheme: ColorScheme
+        private(set) var style: MarkdownStyle
         
-        init(content: Binding<String>, colorScheme: ColorScheme) {
+        init(content: Binding<String>, colorScheme: ColorScheme, style: MarkdownStyle) {
             _content = content
             self.colorScheme = colorScheme
+            self.style = style
         }
         
         func set(content: String) {
@@ -106,6 +98,12 @@ public extension Markdown {
         func set(colorScheme: ColorScheme) {
             if self.colorScheme != colorScheme {
                 self.colorScheme = colorScheme
+            }
+        }
+
+        func set(style: MarkdownStyle) {
+            if self.style != style {
+                self.style = style
             }
         }
     }

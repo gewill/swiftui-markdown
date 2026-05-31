@@ -117,6 +117,50 @@ Markdown(content: $mdStr)
   .markdownStyle(MarkdownStyle(padding: 35 ))
 ```
 
+#### System fonts
+
+Use CSS font-family syntax for built-in system fonts.
+
+```swift
+Markdown(content: $mdStr)
+  .markdownStyle(
+    MarkdownStyle(
+      fontFamily: "\"Avenir Next\", -apple-system, sans-serif",
+      fontSize: 18,
+      lineHeight: 1.6,
+      codeFontFamily: "\"SF Mono\", Menlo, monospace"
+    )
+  )
+```
+
+#### App bundled fonts
+
+Fonts imported by the host app can be exposed to the Markdown WebView with
+`@font-face`. Use the same `fontFamily` name in the body font stack.
+
+```swift
+Markdown(content: $mdStr)
+  .markdownStyle(
+    MarkdownStyle(
+      fontFamily: "'LXGW WenKai', -apple-system, sans-serif",
+      fontFaces: [
+        MarkdownFontFace(
+          fontFamily: "LXGW WenKai",
+          source: .appResource(
+            name: "LXGWWenKai-Regular",
+            fileExtension: "ttf",
+            bundleIdentifier: nil
+          )
+        )
+      ]
+    )
+  )
+```
+
+The example app includes a `Fonts` page that switches between the default
+Markdown style, several named system font stacks, and app-bundled Atkinson
+Hyperlegible / Merriweather font files copied into the app bundle.
+
 ## Configure
 
 <img width="666" alt="image" src="https://user-images.githubusercontent.com/1680273/158029436-cb6eb339-f698-4dcd-9508-acda79683aba.png">

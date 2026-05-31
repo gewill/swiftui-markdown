@@ -71,6 +71,14 @@ struct DemoList: View {
                 ) {
                     MarkdownStyleGroup()
                 }
+                DemoRow(
+                    title: "Fonts",
+                    systemImage: "textformat",
+                    tag: "Fonts",
+                    selection: $selection
+                ) {
+                    FontStyleGroup()
+                }
             }
         }
     }
