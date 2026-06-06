@@ -11,6 +11,7 @@ import SwiftUI
 public enum MarkdownFontSource: Hashable {
     case fileURL(URL)
     case appResource(name: String, fileExtension: String?, bundleIdentifier: String?)
+    case bundleResource(name: String, fileExtension: String?, bundle: Bundle)
 }
 
 public struct MarkdownFontFace: Hashable {

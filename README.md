@@ -146,17 +146,31 @@ Markdown(content: $mdStr)
     MarkdownStyle(
       fontFamily: "'LXGW WenKai', -apple-system, sans-serif",
       fontFaces: [
+        // Using a Bundle reference directly (e.g., .main, or .module in a Swift Package):
         MarkdownFontFace(
           fontFamily: "LXGW WenKai",
-          source: .appResource(
+          source: .bundleResource(
             name: "LXGWWenKai-Regular",
             fileExtension: "ttf",
-            bundleIdentifier: nil
+            bundle: .main
           )
         )
       ]
     )
   )
+```
+
+Or reference a bundle by its identifier:
+
+```swift
+MarkdownFontFace(
+  fontFamily: "LXGW WenKai",
+  source: .appResource(
+    name: "LXGWWenKai-Regular",
+    fileExtension: "ttf",
+    bundleIdentifier: "com.example.AppFonts"
+  )
+)
 ```
 
 For Markdown documents, provide regular, bold, italic, and bold italic faces

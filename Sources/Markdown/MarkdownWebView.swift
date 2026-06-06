@@ -64,10 +64,11 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
     
     var textDidChanged: ((String) -> Void)?
     
-    private var pageLoaded = false
+    internal var pageLoaded = false
     private var currentContent: String = ""
-    private var pendingFunctions = [JavascriptFunction]()
-    
+    internal var pendingContent: String?
+    internal var pendingStyle: MarkdownStyle?
+    internal var pendingTheme: ColorScheme?
     
     override init(frame frameRect: CGRect) {
         super.init(frame: frameRect)
@@ -80,12 +81,35 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
     }
     
     func setContent(_ value: String) {
-        
         guard currentContent != value else {
             return
         }
-        
         currentContent = value
+        
+        if pageLoaded {
+            executeSetContent(value)
+        } else {
+            pendingContent = value
+        }
+    }
+
+    func setTheme(_ theme: ColorScheme) {
+        if pageLoaded {
+            executeSetTheme(theme)
+        } else {
+            pendingTheme = theme
+        }
+    }
+
+    func setMarkdownStyle(_ style: MarkdownStyle) {
+        if pageLoaded {
+            executeSetMarkdownStyle(style)
+        } else {
+            pendingStyle = style
+        }
+    }
+
+    private func executeSetContent(_ value: String) {
         //
         // It's tricky to pass FULL JSON or HTML text with \n or "", ... into JS Bridge
         // Have to wrap with `data_here`
@@ -102,9 +126,9 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
 
         let script = first + content + end
         callJavascript(javascriptString: script)
-        
     }
-    func setTheme(_ theme: ColorScheme) {
+
+    private func executeSetTheme(_ theme: ColorScheme) {
         if theme == .dark {
             callJavascript(javascriptString: "document.body.classList.add('theme-dark');")
             callJavascript(javascriptString: "document.body.classList.remove('theme-light');")
@@ -113,7 +137,10 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
             callJavascript(javascriptString: "document.body.classList.add('theme-light');")
         }
     }
-    func setMarkdownStyle(_ style: MarkdownStyle) {
+
+    private func executeSetMarkdownStyle(_ style: MarkdownStyle) {
+        resetAllPaddings()
+
         if let padding = style.padding {
             setPadding(padding)
         }
@@ -144,6 +171,20 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
         """
         callJavascript(javascriptString: script)
     }
+
+    private func resetAllPaddings() {
+        let script = """
+        if (window.__markdown_preview__) {
+            __markdown_preview__.style.padding = '';
+            __markdown_preview__.style.paddingTop = '';
+            __markdown_preview__.style.paddingBottom = '';
+            __markdown_preview__.style.paddingLeft = '';
+            __markdown_preview__.style.paddingRight = '';
+        }
+        """
+        callJavascript(javascriptString: script)
+    }
+
     func setPadding(_ padding: Int) {
         callJavascript(javascriptString: "__markdown_preview__.style.padding = '\(padding)px';")
     }
@@ -195,9 +236,6 @@ extension MarkdownWebView {
         let data = try! Data(contentsOf: URL(fileURLWithPath: indexPath))
         webview.load(data, mimeType: "text/html", characterEncodingName: "utf-8", baseURL: bundle.resourceURL!)
     }
-    private func addFunction(function: JavascriptFunction) {
-        pendingFunctions.append(function)
-    }
     private func callJavascriptFunction(function: JavascriptFunction) {
         webview.evaluateJavaScript(function.functionString) { (response, error) in
             if let error = error {
@@ -208,18 +246,14 @@ extension MarkdownWebView {
             }
         }
     }
-    private func callPendingFunctions() {
-        for function in pendingFunctions {
-            callJavascriptFunction(function: function)
-        }
-        pendingFunctions.removeAll()
-    }
     private func callJavascript(javascriptString: String, callback: JavascriptCallback? = nil) {
         if pageLoaded {
             callJavascriptFunction(function: JavascriptFunction(functionString: javascriptString, callback: callback))
         }
         else {
-            addFunction(function: JavascriptFunction(functionString: javascriptString, callback: callback))
+            #if DEBUG
+            print("WARNING: callJavascript was called before pageLoaded: \(javascriptString)")
+            #endif
         }
     }
 }
@@ -259,9 +293,11 @@ extension MarkdownWebView {
         return String(json.dropFirst().dropLast())
     }
 
+    private static var dataURLCache = [MarkdownFontSource: String]()
+    private static let cacheQueue = DispatchQueue(label: "com.markdown.fontcache")
+
     private static func fontFaceCSS(_ fontFace: MarkdownFontFace) -> String? {
-        guard let url = url(for: fontFace.source),
-              let dataURL = dataURL(for: url) else {
+        guard let dataURL = dataURL(for: fontFace.source) else {
             return nil
         }
 
@@ -287,10 +323,32 @@ extension MarkdownWebView {
         case .appResource(let name, let fileExtension, let bundleIdentifier):
             let bundle = bundleIdentifier.flatMap(Bundle.init(identifier:)) ?? .main
             return bundle.url(forResource: name, withExtension: fileExtension)
+        case .bundleResource(let name, let fileExtension, let bundle):
+            return bundle.url(forResource: name, withExtension: fileExtension)
         }
     }
 
-    private static func dataURL(for url: URL) -> String? {
+    private static func dataURL(for source: MarkdownFontSource) -> String? {
+        var cached: String?
+        cacheQueue.sync {
+            cached = dataURLCache[source]
+        }
+        if let cached = cached {
+            return cached
+        }
+
+        guard let url = url(for: source) else {
+            return nil
+        }
+
+        // Validate local file URL
+        guard url.isFileURL else {
+            #if DEBUG
+            print("WARNING: MarkdownStyle only supports local file URLs for font sources. Got: \(url)")
+            #endif
+            return nil
+        }
+
         guard let data = try? Data(contentsOf: url) else {
             return nil
         }
@@ -309,7 +367,11 @@ extension MarkdownWebView {
             mimeType = "application/octet-stream"
         }
 
-        return "data:\(mimeType);base64,\(data.base64EncodedString())"
+        let dataURL = "data:\(mimeType);base64,\(data.base64EncodedString())"
+        cacheQueue.sync {
+            dataURLCache[source] = dataURL
+        }
+        return dataURL
     }
 
     private static func cssSingleQuoted(_ value: String) -> String {
@@ -330,7 +392,19 @@ extension MarkdownWebView: WKScriptMessageHandler {
         // is Ready
         if message.name == Constants.mdPreviewDidReady {
             pageLoaded = true
-            callPendingFunctions()
+            
+            if let theme = pendingTheme {
+                executeSetTheme(theme)
+                pendingTheme = nil
+            }
+            if let style = pendingStyle {
+                executeSetMarkdownStyle(style)
+                pendingStyle = nil
+            }
+            if let content = pendingContent {
+                executeSetContent(content)
+                pendingContent = nil
+            }
             return
         }
         
