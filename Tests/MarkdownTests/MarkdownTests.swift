@@ -19,6 +19,17 @@ final class MarkdownTests: XCTestCase {
         XCTAssertTrue(css.contains("--markdown-code-font-family: \"SF Mono\", monospace;"))
     }
 
+    func testCodeFontDefaultsToBodyFontFamily() throws {
+        let style = MarkdownStyle(
+            fontFamily: "'DemoFont', -apple-system, sans-serif"
+        )
+
+        let css = MarkdownWebView.css(for: style)
+
+        XCTAssertTrue(css.contains("--markdown-font-family: 'DemoFont', -apple-system, sans-serif;"))
+        XCTAssertTrue(css.contains("--markdown-code-font-family: 'DemoFont', -apple-system, sans-serif;"))
+    }
+
     func testStyleBuildsAppFontFaceDataURL() throws {
         let fontURL = FileManager.default.temporaryDirectory.appendingPathComponent("MarkdownTestFont.ttf")
         try Data([0x00, 0x01, 0x02]).write(to: fontURL)

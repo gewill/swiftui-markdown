@@ -272,7 +272,7 @@ extension MarkdownWebView {
         if let lineHeight = style.lineHeight {
             rootVariables.append("--markdown-line-height: \(lineHeight);")
         }
-        if let codeFontFamily = style.codeFontFamily {
+        if let codeFontFamily = style.codeFontFamily ?? style.fontFamily {
             rootVariables.append("--markdown-code-font-family: \(codeFontFamily);")
         }
 
