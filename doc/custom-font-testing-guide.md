@@ -194,8 +194,8 @@ font-weight: 700; font-style: italic;
 | `#` / `##` 标题 | 字体切换后标题层级仍明显 |
 | 段落 | 行高生效，阅读节奏稳定 |
 | 列表 | marker 对齐，无重叠 |
-| fenced code block | 使用 `codeFontFamily`，不被正文字体覆盖 |
-| inline code | 使用 `codeFontFamily`，字号稳定 |
+| fenced code block | 未设置 `codeFontFamily` 时继承 `fontFamily`；设置后使用 `codeFontFamily` |
+| inline code | 未设置 `codeFontFamily` 时继承 `fontFamily`；设置后使用 `codeFontFamily` |
 | 链接 | 颜色和点击行为不受字体样式影响 |
 | 粗体/斜体 | 系统 fallback 可接受，不出现空白文字 |
 

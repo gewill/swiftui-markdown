@@ -139,6 +139,9 @@ Fonts imported by the host app can be exposed to the Markdown WebView with
 `@font-face`. Use the same `fontFamily` name in the body font stack.
 Passing one regular face is valid; Markdown bold and italic will fall back to
 WebKit synthesis when matching faces are not provided.
+When `codeFontFamily` is not provided, inline code and fenced code inherit
+`fontFamily`. Set `codeFontFamily` only when code should use a separate
+monospace stack.
 
 ```swift
 Markdown(content: $mdStr)
