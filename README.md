@@ -232,6 +232,8 @@ The example app includes a `Fonts` page that switches between the default
 Markdown style, several named system font stacks, and app-bundled Atkinson
 Hyperlegible / Merriweather static font families copied into the app bundle.
 
+See [CHANGELOG.md](CHANGELOG.md) for what this fork changes on top of upstream.
+
 ## Configure
 
 <img width="666" alt="image" src="https://user-images.githubusercontent.com/1680273/158029436-cb6eb339-f698-4dcd-9508-acda79683aba.png">
