@@ -272,8 +272,13 @@ extension MarkdownWebView {
         if let lineHeight = style.lineHeight {
             rootVariables.append("--markdown-line-height: \(lineHeight);")
         }
-        if let codeFontFamily = style.codeFontFamily ?? style.fontFamily {
+        if let codeFontFamily = style.codeFontFamily {
             rootVariables.append("--markdown-code-font-family: \(codeFontFamily);")
+            rootVariables.append("--markdown-inline-code-font-family: \(codeFontFamily);")
+        } else if let fontFamily = style.fontFamily {
+            // Only inline code inherits the body font. Fenced code blocks keep the
+            // monospace stack from marked.css so column alignment survives.
+            rootVariables.append("--markdown-inline-code-font-family: \(fontFamily);")
         }
 
         if !rootVariables.isEmpty {

@@ -182,11 +182,15 @@
   background-color: var(--color-canvas-default);
 }
 
-.markdown-body code,
 .markdown-body kbd,
 .markdown-body pre,
 .markdown-body samp {
   font-family: var(--markdown-code-font-family, monospace,monospace);
+  font-size: 1em;
+}
+
+.markdown-body code {
+  font-family: var(--markdown-inline-code-font-family, monospace,monospace);
   font-size: 1em;
 }
 
@@ -393,7 +397,7 @@
 
 .markdown-body tt,
 .markdown-body code {
-  font-family: var(--markdown-code-font-family, ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace);
+  font-family: var(--markdown-inline-code-font-family, ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace);
   font-size: 12px;
 }
 
@@ -832,6 +836,7 @@
 
 .markdown-body pre code,
 .markdown-body pre tt {
+  font-family: var(--markdown-code-font-family, ui-monospace,SFMono-Regular,SF Mono,Menlo,Consolas,Liberation Mono,monospace);
   display: inline;
   max-width: auto;
   padding: 0;

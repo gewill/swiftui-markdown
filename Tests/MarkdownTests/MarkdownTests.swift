@@ -17,9 +17,10 @@ final class MarkdownTests: XCTestCase {
         XCTAssertTrue(css.contains("--markdown-font-size: 18px;"))
         XCTAssertTrue(css.contains("--markdown-line-height: 1.65;"))
         XCTAssertTrue(css.contains("--markdown-code-font-family: \"SF Mono\", monospace;"))
+        XCTAssertTrue(css.contains("--markdown-inline-code-font-family: \"SF Mono\", monospace;"))
     }
 
-    func testCodeFontDefaultsToBodyFontFamily() throws {
+    func testInlineCodeInheritsBodyFontButCodeBlocksStayMonospaced() throws {
         let style = MarkdownStyle(
             fontFamily: "'DemoFont', -apple-system, sans-serif"
         )
@@ -27,7 +28,10 @@ final class MarkdownTests: XCTestCase {
         let css = MarkdownWebView.css(for: style)
 
         XCTAssertTrue(css.contains("--markdown-font-family: 'DemoFont', -apple-system, sans-serif;"))
-        XCTAssertTrue(css.contains("--markdown-code-font-family: 'DemoFont', -apple-system, sans-serif;"))
+        XCTAssertTrue(css.contains("--markdown-inline-code-font-family: 'DemoFont', -apple-system, sans-serif;"))
+        // Leaving --markdown-code-font-family undefined lets marked.css fall back to
+        // its monospace stack, so column alignment inside fenced blocks survives.
+        XCTAssertFalse(css.contains("--markdown-code-font-family:"))
     }
 
     func testStyleBuildsAppFontFaceDataURL() throws {
