@@ -18,6 +18,16 @@ adds on top of that baseline.
 - DocC documentation for the public API, with a landing page and an article on
   bundling fonts. `.spi.yml` lets Swift Package Index build and host it ([#18]).
 
+### Changed
+
+- Strip the README down to this fork. It carried the upstream author's app
+  promotion banner, sponsor and social badges, a CI badge reporting another
+  repository's builds, and installation instructions pointing at the upstream
+  package — following them installed something else. The platform badge said
+  macOS 10.15 and iOS 13, where the package requires macOS 11, iOS 14 and
+  visionOS 1. The example pages carried copies of the same badges and URL
+  ([#19]).
+
 
 ## [2.0.0] - 2026-09-16
 
@@ -147,3 +157,4 @@ its own major versions.
 [#13]: https://github.com/gewill/swiftui-markdown/pull/13
 [#14]: https://github.com/gewill/swiftui-markdown/pull/14
 [#18]: https://github.com/gewill/swiftui-markdown/pull/18
+[#19]: https://github.com/gewill/swiftui-markdown/pull/19

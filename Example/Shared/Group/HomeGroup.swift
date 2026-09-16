@@ -12,8 +12,8 @@ struct HomeGroup: View {
         Markdown
         ===
 
-        [![CI](https://github.com/jaywcjlove/markdown/actions/workflows/ci.yml/badge.svg)](https://github.com/jaywcjlove/markdown/actions/workflows/ci.yml)
-        ![SwiftUI Support](https://shields.io/badge/SwiftUI-macOS%20v10.15%20%7C%20iOS%20v13-green?logo=Swift&style=flat)
+        [![Test](https://github.com/gewill/swiftui-markdown/actions/workflows/test.yml/badge.svg)](https://github.com/gewill/swiftui-markdown/actions/workflows/test.yml)
+        ![SwiftUI Support](https://shields.io/badge/SwiftUI-macOS%20v11%20%7C%20iOS%20v14%20%7C%20visionOS%20v1-green?logo=Swift&style=flat)
 
         Render Markdown text in SwiftUI. The preview is rendered by [`@wcj/markdown-to-html`](https://github.com/jaywcjlove/markdown-to-html), which is built on unified/remark/rehype.
 
@@ -24,7 +24,7 @@ struct HomeGroup: View {
         You can add MarkdownUI to an Xcode project by adding it as a package dependency.
 
         1. From the File menu, select Add Packages…
-        2. Enter https://github.com/jaywcjlove/markdown the Search or Enter Package URL search field
+        2. Enter https://github.com/gewill/swiftui-markdown in the Search or Enter Package URL search field
         3. Link `Markdown` to your application target
 
         Or add the following to `Package.swift`:
