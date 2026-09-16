@@ -1,0 +1,37 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  Test:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Show toolchain
+        run: swift --version
+
+      - name: Unit tests
+        run: swift test
+
+      - name: Build macOS example
+        run: |
+          xcodebuild build -quiet \
+            -project Example/Example.xcodeproj \
+            -scheme "Example (macOS)" \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Build iOS example
+        run: |
+          xcodebuild build -quiet \
+            -project Example/Example.xcodeproj \
+            -scheme "Example (iOS)" \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
