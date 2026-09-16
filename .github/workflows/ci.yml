@@ -16,7 +16,7 @@ jobs:
         uses: jaywcjlove/markdown-to-html-cli@main
         with:
           output: website/index.html
-          github-corners: https://github.com/jaywcjlove/markdown
+          github-corners: https://github.com/gewill/swiftui-markdown
           favicon: https://forums.developer.apple.com/forums/build-02092022-2/public/assets/favicon.ico
 
       - name: Generate Contributors Images

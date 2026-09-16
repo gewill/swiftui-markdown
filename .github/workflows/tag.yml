@@ -15,7 +15,7 @@ jobs:
         uses: jaywcjlove/markdown-to-html-cli@main
         with:
           output: website/index.html
-          github-corners: https://github.com/jaywcjlove/markdown
+          github-corners: https://github.com/gewill/swiftui-markdown
           favicon: https://forums.developer.apple.com/forums/build-02092022-2/public/assets/favicon.ico
 
       - name: Generate Contributors Images
@@ -40,7 +40,6 @@ jobs:
         id: changelog
         uses: jaywcjlove/changelog-generator@main
         with:
-          filter-author: (小弟调调™)
           filter: (^[\s]+?[R|r]elease)|(^[R|r]elease)
           
       - name: Create Release
@@ -51,9 +50,9 @@ jobs:
           name: ${{ steps.changelog.outputs.tag }}
           tag: ${{ steps.changelog.outputs.tag }}
           body: |
-            [![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-048754?logo=buymeacoffee)](https://jaywcjlove.github.io/#/sponsor)
-            
-            Documentation ${{ steps.changelog.outputs.tag }}: https://raw.githack.com/jaywcjlove/markdown/${{ steps.changelog.outputs.gh-pages-short-hash }}/index.html
+            Documentation ${{ steps.changelog.outputs.tag }}: https://raw.githack.com/gewill/swiftui-markdown/${{ steps.changelog.outputs.gh-pages-short-hash }}/index.html
             Comparing Changes: ${{ steps.changelog.outputs.compareurl }}
+
+            A curated summary of this release is in [CHANGELOG.md](https://github.com/gewill/swiftui-markdown/blob/main/CHANGELOG.md).
 
             ${{ steps.changelog.outputs.changelog }}
