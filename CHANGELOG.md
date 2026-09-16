@@ -65,8 +65,23 @@ release.
   the OFL texts are in the built app, which previously shipped the fonts without
   the license the OFL asks to accompany them ([#9]).
 
+- Sync the bundled renderer, `@wcj/markdown-to-html`, from 1.0.0 (2022) to 3.0.6.
+  Its public surface is unchanged — `markdown.default()`, `getCodeString()` and
+  the `rewrite` option all behave the same — and the minified bundle drops from
+  3.2 MB to 1.2 MB. The stylesheet it ships was re-patched with this fork's font
+  variables rather than overwritten ([#14]).
+
 ### Fixed
 
+- Theme switching works. `setTheme` was adding `theme-light` and `theme-dark`
+  classes that no stylesheet has ever read; light and dark actually came from
+  the `prefers-color-scheme` queries in the old stylesheet, so the `theme`
+  argument had no effect. 3.0.6 keys its colour variables off a
+  `data-color-mode` attribute instead, which is now set on the document element
+  — without it every colour variable would be undefined ([#14]).
+- Drop the `.math.math-inline` rule. It existed to clear the grey background of
+  the `<code>` element that used to wrap inline KaTeX; 3.0.6 emits the KaTeX
+  span directly, so the rule matched nothing ([#14]).
 - Fenced code blocks keep their monospace stack when only `fontFamily` is set.
   A single custom property fed both inline code and code blocks, so setting a
   body typeface turned code blocks into it and destroyed column alignment.
@@ -120,3 +135,4 @@ release.
 [#10]: https://github.com/gewill/swiftui-markdown/pull/10
 [#12]: https://github.com/gewill/swiftui-markdown/issues/12
 [#13]: https://github.com/gewill/swiftui-markdown/pull/13
+[#14]: https://github.com/gewill/swiftui-markdown/pull/14

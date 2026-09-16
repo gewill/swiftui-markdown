@@ -134,13 +134,10 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
     }
 
     private func executeSetTheme(_ theme: ColorScheme) {
-        if theme == .dark {
-            callJavascript(javascriptString: "document.body.classList.add('theme-dark');")
-            callJavascript(javascriptString: "document.body.classList.remove('theme-light');")
-        } else {
-            callJavascript(javascriptString: "document.body.classList.remove('theme-dark');")
-            callJavascript(javascriptString: "document.body.classList.add('theme-light');")
-        }
+        // marked.css keys its colour variables off this attribute. The theme-light
+        // and theme-dark classes it replaces were never read by any stylesheet.
+        let mode = theme == .dark ? "dark" : "light"
+        callJavascript(javascriptString: "document.documentElement.setAttribute('data-color-mode', '\(mode)');")
     }
 
     private func executeSetMarkdownStyle(_ style: MarkdownStyle) {
