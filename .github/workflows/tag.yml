@@ -13,8 +13,10 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
-          # Needed to resolve the previous tag for the comparison link.
+          # Both are needed to resolve the previous tag for the comparison link:
+          # depth alone leaves the checkout without the other tags.
           fetch-depth: 0
+          fetch-tags: true
 
       - run: mkdir website
 
@@ -64,6 +66,8 @@ jobs:
           if [ -n "$previous" ]; then
             printf '\n**Full diff**: https://github.com/%s/compare/%s...%s\n' \
               "$GITHUB_REPOSITORY" "$previous" "$GITHUB_REF_NAME" >> release-notes.md
+          else
+            echo "::warning::no earlier tag reachable from $GITHUB_REF_NAME; omitting the comparison link"
           fi
           printf '\n**Documentation**: https://raw.githack.com/%s/gh-pages/index.html\n' \
             "$GITHUB_REPOSITORY" >> release-notes.md
