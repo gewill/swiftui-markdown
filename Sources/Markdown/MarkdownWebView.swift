@@ -70,6 +70,8 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
     internal var pendingStyle: MarkdownStyle?
     internal var pendingTheme: ColorScheme?
     internal private(set) var appliedFontFaces = [MarkdownFontFace]()
+    private var currentStyle: MarkdownStyle?
+    private var currentTheme: ColorScheme?
 
     override init(frame frameRect: CGRect) {
         super.init(frame: frameRect)
@@ -95,6 +97,7 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
     }
 
     func setTheme(_ theme: ColorScheme) {
+        currentTheme = theme
         if pageLoaded {
             executeSetTheme(theme)
         } else {
@@ -103,6 +106,7 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
     }
 
     func setMarkdownStyle(_ style: MarkdownStyle) {
+        currentStyle = style
         if pageLoaded {
             executeSetMarkdownStyle(style)
         } else {
@@ -238,19 +242,19 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
         callJavascript(javascriptString: script)
     }
 
-    func setPadding(_ padding: Int) {
+    private func setPadding(_ padding: Int) {
         callJavascript(javascriptString: "__markdown_preview__.style.padding = '\(padding)px';")
     }
-    func setPaddingTop(_ top: Int) {
+    private func setPaddingTop(_ top: Int) {
         callJavascript(javascriptString: "__markdown_preview__.style.paddingTop = '\(top)px';")
     }
-    func setPaddingBottom(_ bottom: Int) {
+    private func setPaddingBottom(_ bottom: Int) {
         callJavascript(javascriptString: "__markdown_preview__.style.paddingBottom = '\(bottom)px';")
     }
-    func setPaddingLeft(_ left: Int) {
+    private func setPaddingLeft(_ left: Int) {
         callJavascript(javascriptString: "__markdown_preview__.style.paddingLeft = '\(left)px';")
     }
-    func setPaddingRight(_ right: Int) {
+    private func setPaddingRight(_ right: Int) {
         callJavascript(javascriptString: "__markdown_preview__.style.paddingRight = '\(right)px';")
     }
     ///  open links in browsers
@@ -268,6 +272,21 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
         /// Disable right-click menu
         webView.evaluateJavaScript("document.body.setAttribute('oncontextmenu', 'event.preventDefault();');", completionHandler: nil);
     }
+
+    /// The content process can be killed under memory pressure. Without this the
+    /// view keeps believing the page is live and silently drops every later
+    /// update, leaving a blank preview until the view is recreated.
+    public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        Self.log("web content process terminated, reloading the preview")
+
+        pageLoaded = false
+        appliedFontFaces = []
+        pendingTheme = currentTheme
+        pendingStyle = currentStyle
+        pendingContent = currentContent
+
+        loadPage()
+    }
 }
 
 
@@ -280,14 +299,20 @@ extension MarkdownWebView {
         webview.topAnchor.constraint(equalTo: topAnchor).isActive = true
         webview.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
 
+        loadPage()
+    }
+
+    private func loadPage() {
         guard let bundlePath = Bundle.module.path(forResource: "web", ofType: "bundle"),
-            let bundle = Bundle(path: bundlePath),
-            let indexPath = bundle.path(forResource: "index", ofType: "html") else {
-                fatalError("Ace editor is missing")
+              let bundle = Bundle(path: bundlePath),
+              let indexPath = bundle.path(forResource: "index", ofType: "html"),
+              let data = try? Data(contentsOf: URL(fileURLWithPath: indexPath)),
+              let resourceURL = bundle.resourceURL else {
+            Self.log("could not load the bundled preview page")
+            return
         }
 
-        let data = try! Data(contentsOf: URL(fileURLWithPath: indexPath))
-        webview.load(data, mimeType: "text/html", characterEncodingName: "utf-8", baseURL: bundle.resourceURL!)
+        webview.load(data, mimeType: "text/html", characterEncodingName: "utf-8", baseURL: resourceURL)
     }
     private func callJavascriptFunction(function: JavascriptFunction) {
         webview.evaluateJavaScript(function.functionString) { (response, error) in
@@ -409,10 +434,10 @@ extension MarkdownWebView {
             "src: \(source);"
         ]
 
-        if let fontWeight = fontFace.fontWeight {
+        if let fontWeight = sanitizedDescriptor(fontFace.fontWeight, name: "fontWeight") {
             declarations.append("font-weight: \(fontWeight);")
         }
-        if let fontStyle = fontFace.fontStyle {
+        if let fontStyle = sanitizedDescriptor(fontFace.fontStyle, name: "fontStyle") {
             declarations.append("font-style: \(fontStyle);")
         }
 
@@ -503,6 +528,24 @@ extension MarkdownWebView {
 
         sourceCache.setObject(descriptor as NSString, forKey: key, cost: descriptor.utf8.count)
         return descriptor
+    }
+
+    /// `@font-face` is assembled as CSS text, so a descriptor carrying `;` or `}`
+    /// could close the rule and append rules of its own. Everything CSS actually
+    /// allows here — `normal`, `bold`, `700`, `400 700`, `oblique 14deg` — fits in
+    /// letters, digits, spaces, dots and hyphens.
+    private static func sanitizedDescriptor(_ value: String?, name: String) -> String? {
+        guard let value = value else {
+            return nil
+        }
+
+        let allowed = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .-")
+        guard !value.isEmpty, value.unicodeScalars.allSatisfy(allowed.contains) else {
+            log("ignoring \(name) '\(value)': unexpected characters")
+            return nil
+        }
+
+        return value
     }
 
     private static func cssSingleQuoted(_ value: String) -> String {

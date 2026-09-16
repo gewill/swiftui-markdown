@@ -267,6 +267,83 @@ final class MarkdownTests: XCTestCase {
         }
     }
 
+    /// @font-face is built as CSS text, so a descriptor holding `;` or `}` could
+    /// close the rule and append rules of its own. Verified to work before the
+    /// sanitizer: the injected rule really did hide the page body.
+    func testFontDescriptorsCannotInjectCSS() throws {
+        let fontURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("InjectFont-\(UUID().uuidString).ttf")
+        try Data([0x00, 0x01]).write(to: fontURL)
+        defer { try? FileManager.default.removeItem(at: fontURL) }
+
+        let style = MarkdownStyle(
+            fontFamily: "'Inject', sans-serif",
+            fontFaces: [MarkdownFontFace(
+                fontFamily: "Inject",
+                source: .fileURL(fontURL),
+                fontWeight: "400; } body { display: none } @font-face { font-weight: 400",
+                fontStyle: "italic"
+            )]
+        )
+
+        let css = MarkdownWebView.css(for: style)
+
+        XCTAssertEqual(css.components(separatedBy: "@font-face").count - 1, 1)
+        XCTAssertFalse(css.contains("display: none"))
+        XCTAssertFalse(css.contains("font-weight:"), "the unsafe descriptor should be dropped")
+        XCTAssertTrue(css.contains("font-style: italic;"), "the safe one should survive")
+    }
+
+    func testValidFontDescriptorsSurvive() throws {
+        let fontURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ValidFont-\(UUID().uuidString).ttf")
+        try Data([0x00, 0x01]).write(to: fontURL)
+        defer { try? FileManager.default.removeItem(at: fontURL) }
+
+        // Everything CSS allows for these descriptors, including variable-font
+        // ranges and an oblique angle.
+        for (weight, fontStyle) in [("normal", "normal"), ("bold", "italic"),
+                                    ("700", "oblique 14deg"), ("400 700", "normal")] {
+            let style = MarkdownStyle(
+                fontFamily: "'Valid', sans-serif",
+                fontFaces: [MarkdownFontFace(
+                    fontFamily: "Valid",
+                    source: .fileURL(fontURL),
+                    fontWeight: weight,
+                    fontStyle: fontStyle
+                )]
+            )
+
+            let css = MarkdownWebView.css(for: style)
+            XCTAssertTrue(css.contains("font-weight: \(weight);"), "dropped weight \(weight)")
+            XCTAssertTrue(css.contains("font-style: \(fontStyle);"), "dropped style \(fontStyle)")
+        }
+    }
+
+    /// A family name carrying a quote must stay inside its CSS string. Counting
+    /// "@font-face" in the text would prove nothing here, since the hostile value
+    /// contains that literal itself — WebKit parses the result below into exactly
+    /// one CSSFontFaceRule plus the :root rule, with body still displayed.
+    func testFontFamilyQuotesAreEscaped() throws {
+        let fontURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("QuoteFont-\(UUID().uuidString).ttf")
+        try Data([0x00, 0x01]).write(to: fontURL)
+        defer { try? FileManager.default.removeItem(at: fontURL) }
+
+        let style = MarkdownStyle(
+            fontFamily: "'Quote', sans-serif",
+            fontFaces: [MarkdownFontFace(
+                fontFamily: "Quote'; } body { display: none } @font-face { font-family: 'X",
+                source: .fileURL(fontURL)
+            )]
+        )
+
+        let css = MarkdownWebView.css(for: style)
+
+        XCTAssertTrue(css.contains(#"font-family: 'Quote\';"#), "the quote should be escaped")
+        XCTAssertFalse(css.contains(#"font-family: 'Quote';"#), "the string must not be closed early")
+    }
+
     private func makeTemporaryFontFiles(_ files: [String: Data]) throws -> [String: URL] {
         var urls = [String: URL]()
         for (name, data) in files {
