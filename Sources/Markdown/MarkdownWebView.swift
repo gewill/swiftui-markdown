@@ -326,11 +326,34 @@ extension MarkdownWebView {
         case .fileURL(let url):
             return url
         case .appResource(let name, let fileExtension, let bundleIdentifier):
-            let bundle = bundleIdentifier.flatMap(Bundle.init(identifier:)) ?? .main
-            return bundle.url(forResource: name, withExtension: fileExtension)
+            let bundle: Bundle
+            if let bundleIdentifier = bundleIdentifier {
+                guard let resolved = Bundle(identifier: bundleIdentifier) else {
+                    log("bundle '\(bundleIdentifier)' is not loaded, skipping font '\(name)'")
+                    return nil
+                }
+                bundle = resolved
+            } else {
+                bundle = .main
+            }
+            return resource(name, fileExtension, in: bundle)
         case .bundleResource(let name, let fileExtension, let bundle):
-            return bundle.url(forResource: name, withExtension: fileExtension)
+            return resource(name, fileExtension, in: bundle)
         }
+    }
+
+    private static func resource(_ name: String, _ fileExtension: String?, in bundle: Bundle) -> URL? {
+        guard let url = bundle.url(forResource: name, withExtension: fileExtension) else {
+            log("font '\(name)' not found in \(bundle.bundleURL.lastPathComponent)")
+            return nil
+        }
+        return url
+    }
+
+    private static func log(_ message: String) {
+        #if DEBUG
+        print("WARNING: MarkdownStyle \(message)")
+        #endif
     }
 
     private static func dataURL(for source: MarkdownFontSource) -> String? {
@@ -348,13 +371,15 @@ extension MarkdownWebView {
 
         // Validate local file URL
         guard url.isFileURL else {
-            #if DEBUG
-            print("WARNING: MarkdownStyle only supports local file URLs for font sources. Got: \(url)")
-            #endif
+            log("only supports local file URLs for font sources. Got: \(url)")
             return nil
         }
 
-        guard let data = try? Data(contentsOf: url) else {
+        let data: Data
+        do {
+            data = try Data(contentsOf: url)
+        } catch {
+            log("could not read font at \(url.path): \(error.localizedDescription)")
             return nil
         }
 

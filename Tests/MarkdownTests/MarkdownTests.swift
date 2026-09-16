@@ -184,6 +184,44 @@ final class MarkdownTests: XCTestCase {
         XCTAssertEqual(webView.pendingTheme, .dark)
     }
 
+    func testBundleResourceLoadsFromRealBundle() throws {
+        let bundleURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("MarkdownFonts-\(UUID().uuidString).bundle")
+        try FileManager.default.createDirectory(at: bundleURL, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: bundleURL) }
+        try Data([0x00, 0x01, 0x02]).write(to: bundleURL.appendingPathComponent("BundledFont.ttf"))
+
+        let bundle = try XCTUnwrap(Bundle(url: bundleURL))
+        let style = MarkdownStyle(
+            fontFamily: "'BundledFont', sans-serif",
+            fontFaces: [MarkdownFontFace(
+                fontFamily: "BundledFont",
+                source: .bundleResource(name: "BundledFont", fileExtension: "ttf", bundle: bundle)
+            )]
+        )
+
+        let css = MarkdownWebView.css(for: style)
+        XCTAssertTrue(css.contains("src: url('data:font/ttf;base64,AAEC');"))
+    }
+
+    /// An unresolvable bundle identifier must drop the face rather than quietly
+    /// searching the main bundle, which could pick up an unrelated same-named font.
+    func testUnresolvableBundleIdentifierProducesNoFontFace() throws {
+        let style = MarkdownStyle(
+            fontFamily: "'Decoy', sans-serif",
+            fontFaces: [MarkdownFontFace(
+                fontFamily: "Decoy",
+                source: .appResource(
+                    name: "Decoy",
+                    fileExtension: "ttf",
+                    bundleIdentifier: "com.example.bundle.that.is.not.loaded"
+                )
+            )]
+        )
+
+        XCTAssertFalse(MarkdownWebView.css(for: style).contains("@font-face"))
+    }
+
     private func makeTemporaryFontFiles(_ files: [String: Data]) throws -> [String: URL] {
         var urls = [String: URL]()
         for (name, data) in files {
