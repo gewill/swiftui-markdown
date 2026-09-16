@@ -87,6 +87,12 @@ release.
   paths that could reach them: the padding helpers are private, since they are
   only ever driven at the right time ([#8]).
 
+- Name the renderer correctly. The preview has always been rendered by
+  `@wcj/markdown-to-html`, built on unified/remark/rehype, not by
+  [marked](https://github.com/markedjs/marked); `marked.css` is github-markdown-css
+  under a misleading name. The README and three example pages said otherwise
+  ([#13], [#12]).
+
 ### Removed
 
 - `doc/custom-font-development-plan.md`, a progress table with every row marked
@@ -112,3 +118,5 @@ release.
 [#8]: https://github.com/gewill/swiftui-markdown/pull/8
 [#9]: https://github.com/gewill/swiftui-markdown/pull/9
 [#10]: https://github.com/gewill/swiftui-markdown/pull/10
+[#12]: https://github.com/gewill/swiftui-markdown/issues/12
+[#13]: https://github.com/gewill/swiftui-markdown/pull/13
