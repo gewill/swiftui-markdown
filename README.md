@@ -137,6 +137,8 @@ Markdown(content: $mdStr)
 
 Fonts imported by the host app can be exposed to the Markdown WebView with
 `@font-face`. Use the same `fontFamily` name in the body font stack.
+`ttf`, `otf`, `woff` and `woff2` files are supported; `woff2` is the smallest
+and is what the example app ships.
 Passing one regular face is valid; Markdown bold and italic will fall back to
 WebKit synthesis when matching faces are not provided.
 When `codeFontFamily` is not provided, inline code inherits `fontFamily` while

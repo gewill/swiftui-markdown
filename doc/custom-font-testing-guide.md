@@ -82,14 +82,14 @@ xcodebuild \
 验收点：
 
 - 两个 target 都能编译通过。
-- 构建日志中复制 `AtkinsonHyperlegible-Regular.ttf`。
-- 构建日志中复制 `AtkinsonHyperlegible-Bold.ttf`。
-- 构建日志中复制 `AtkinsonHyperlegible-Italic.ttf`。
-- 构建日志中复制 `AtkinsonHyperlegible-BoldItalic.ttf`。
-- 构建日志中复制 `Merriweather-Regular.ttf`。
-- 构建日志中复制 `Merriweather-Bold.ttf`。
-- 构建日志中复制 `Merriweather-Italic.ttf`。
-- 构建日志中复制 `Merriweather-BoldItalic.ttf`。
+- 构建日志中复制 `AtkinsonHyperlegible-Regular.woff2`。
+- 构建日志中复制 `AtkinsonHyperlegible-Bold.woff2`。
+- 构建日志中复制 `AtkinsonHyperlegible-Italic.woff2`。
+- 构建日志中复制 `AtkinsonHyperlegible-BoldItalic.woff2`。
+- 构建日志中复制 `Merriweather-Regular.woff2`。
+- 构建日志中复制 `Merriweather-Bold.woff2`。
+- 构建日志中复制 `Merriweather-Italic.woff2`。
+- 构建日志中复制 `Merriweather-BoldItalic.woff2`。
 - 构建日志中没有复制旧的 `KaTeX_Typewriter-Regular.ttf` 到 Example app。
 
 ### 格式检查
@@ -230,15 +230,15 @@ find Example/Shared/Fonts -maxdepth 1 -type f -print | sort
 
 必须包含：
 
-- `AtkinsonHyperlegible-Regular.ttf`
-- `AtkinsonHyperlegible-Bold.ttf`
-- `AtkinsonHyperlegible-Italic.ttf`
-- `AtkinsonHyperlegible-BoldItalic.ttf`
+- `AtkinsonHyperlegible-Regular.woff2`
+- `AtkinsonHyperlegible-Bold.woff2`
+- `AtkinsonHyperlegible-Italic.woff2`
+- `AtkinsonHyperlegible-BoldItalic.woff2`
 - `AtkinsonHyperlegible-OFL.txt`
-- `Merriweather-Regular.ttf`
-- `Merriweather-Bold.ttf`
-- `Merriweather-Italic.ttf`
-- `Merriweather-BoldItalic.ttf`
+- `Merriweather-Regular.woff2`
+- `Merriweather-Bold.woff2`
+- `Merriweather-Italic.woff2`
+- `Merriweather-BoldItalic.woff2`
 - `Merriweather-OFL.txt`
 
 授权验收：
