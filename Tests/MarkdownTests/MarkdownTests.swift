@@ -55,7 +55,7 @@ final class MarkdownTests: XCTestCase {
 
         XCTAssertTrue(css.contains("@font-face"))
         XCTAssertTrue(css.contains("font-family: 'DemoFont';"))
-        XCTAssertTrue(css.contains("src: url('data:font/ttf;base64,AAEC');"))
+        XCTAssertTrue(css.contains("src: url('data:font/ttf;base64,AAEC') format('truetype');"))
         XCTAssertTrue(css.contains("font-weight: 400;"))
         XCTAssertTrue(css.contains("font-style: normal;"))
     }
@@ -131,14 +131,14 @@ final class MarkdownTests: XCTestCase {
 
         // 1. First execution creates cached entry
         let css1 = MarkdownWebView.css(for: style)
-        XCTAssertTrue(css1.contains("src: url('data:font/ttf;base64,CgsM');"))
+        XCTAssertTrue(css1.contains("src: url('data:font/ttf;base64,CgsM') format('truetype');"))
 
         // 2. Delete the physical file
         try FileManager.default.removeItem(at: fontURL)
 
         // 3. Second execution should succeed from cache despite the file being missing
         let css2 = MarkdownWebView.css(for: style)
-        XCTAssertTrue(css2.contains("src: url('data:font/ttf;base64,CgsM');"))
+        XCTAssertTrue(css2.contains("src: url('data:font/ttf;base64,CgsM') format('truetype');"))
     }
 
     func testBundleResourceLoading() throws {
@@ -201,7 +201,7 @@ final class MarkdownTests: XCTestCase {
         )
 
         let css = MarkdownWebView.css(for: style)
-        XCTAssertTrue(css.contains("src: url('data:font/ttf;base64,AAEC');"))
+        XCTAssertTrue(css.contains("src: url('data:font/ttf;base64,AAEC') format('truetype');"))
     }
 
     /// An unresolvable bundle identifier must drop the face rather than quietly
@@ -220,6 +220,51 @@ final class MarkdownTests: XCTestCase {
         )
 
         XCTAssertFalse(MarkdownWebView.css(for: style).contains("@font-face"))
+    }
+
+    func testRootVariablesAndFontFacesAreBuiltSeparately() throws {
+        let fontURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("SplitFont-\(UUID().uuidString).ttf")
+        try Data([0x00, 0x01]).write(to: fontURL)
+        defer { try? FileManager.default.removeItem(at: fontURL) }
+
+        let style = MarkdownStyle(
+            fontFamily: "'SplitFont', sans-serif",
+            fontSize: 20,
+            fontFaces: [MarkdownFontFace(fontFamily: "SplitFont", source: .fileURL(fontURL))]
+        )
+
+        // The view injects these through two different paths, so neither half may
+        // carry the other's payload.
+        let faces = MarkdownWebView.fontFaceCSS(for: style.fontFaces)
+        XCTAssertTrue(faces.contains("@font-face"))
+        XCTAssertFalse(faces.contains(":root"))
+        XCTAssertFalse(faces.contains("--markdown-"))
+
+        let variables = MarkdownWebView.rootVariables(for: style)
+        XCTAssertEqual(variables.first(where: { $0.name == "--markdown-font-size" })?.value, "20px")
+        XCTAssertFalse(variables.contains { $0.value.contains("data:") })
+    }
+
+    /// Stale properties are cleared by name before each update, so a variable that
+    /// rootVariables can emit but rootVariableNames does not list would stick
+    /// around forever once set.
+    func testEveryEmittedVariableIsAlsoCleared() throws {
+        let style = MarkdownStyle(
+            fontFamily: "Georgia, serif",
+            fontSize: 18,
+            lineHeight: 1.6,
+            codeFontFamily: "Menlo, monospace"
+        )
+
+        let emitted = MarkdownWebView.rootVariables(for: style).map(\.name)
+        XCTAssertEqual(Set(emitted).count, emitted.count, "duplicate variable names")
+        for name in emitted {
+            XCTAssertTrue(
+                MarkdownWebView.rootVariableNames.contains(name),
+                "\(name) is emitted but never cleared"
+            )
+        }
     }
 
     private func makeTemporaryFontFiles(_ files: [String: Data]) throws -> [String: URL] {
