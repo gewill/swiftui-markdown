@@ -9,6 +9,32 @@ import WebKit
     public typealias ViewRepresentable = UIViewRepresentable
 #endif
 
+/// A SwiftUI view that renders Markdown as a live preview.
+///
+/// The preview runs in a web view driven by the bundled
+/// [@wcj/markdown-to-html](https://github.com/jaywcjlove/markdown-to-html)
+/// renderer, so GitHub Flavored Markdown, syntax highlighting and KaTeX all
+/// work without further setup.
+///
+/// ```swift
+/// struct ContentView: View {
+///     @State private var text = "# Hello\n\nSome **Markdown**."
+///
+///     var body: some View {
+///         Markdown(content: $text)
+///     }
+/// }
+/// ```
+///
+/// The binding is read continuously, so editing the text elsewhere — in a
+/// `TextEditor`, say — updates the preview as you type.
+///
+/// Padding and typography come from ``MarkdownStyle``, applied with
+/// ``SwiftUI/View/markdownStyle(_:)``. Light and dark follow the environment's
+/// colour scheme unless you pass one to ``init(content:theme:)``.
+///
+/// Links are opened with the environment's `openURL` action rather than
+/// navigated to inside the preview.
 public struct Markdown: ViewRepresentable {
     
     @Binding var content: String
@@ -17,9 +43,18 @@ public struct Markdown: ViewRepresentable {
     var textDidChanged: ((String) -> Void)?
     var theme: ColorScheme?
 
+    /// Creates a preview of the given Markdown, following the environment's
+    /// colour scheme.
+    /// - Parameter content: The Markdown to render. Changes to it are reflected
+    ///   in the preview.
     public init(content: Binding<String>) {
         self._content = content
     }
+
+    /// Creates a preview of the given Markdown with an explicit colour scheme.
+    /// - Parameters:
+    ///   - content: The Markdown to render.
+    ///   - theme: The colour scheme to render with.
     public init(content: Binding<String>, theme: ColorScheme?) {
         self._content = content
         self.theme = theme
@@ -72,6 +107,17 @@ public struct Markdown: ViewRepresentable {
 }
 
 extension View {
+    /// Sets the style for Markdown previews in this view hierarchy.
+    ///
+    /// ```swift
+    /// Markdown(content: $text)
+    ///     .markdownStyle(MarkdownStyle(padding: 24, fontSize: 17))
+    /// ```
+    ///
+    /// The style travels through the environment, so it can be applied to a
+    /// container and picked up by any preview inside it. Changing it updates
+    /// previews that are already on screen.
+    /// - Parameter markdownStyle: The style to apply.
     public func markdownStyle(_ markdownStyle: MarkdownStyle) -> some View {
       return environment(\.markdownStyle, markdownStyle)
     }

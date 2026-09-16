@@ -30,6 +30,11 @@ private struct JavascriptFunction {
     }
 }
 
+/// The platform view that hosts the preview.
+///
+/// ``Markdown`` creates one of these and drives it; there is normally no reason
+/// to use it directly. It is public because `Markdown` vends it from
+/// `makeNSView(context:)` and `makeUIView(context:)`.
 public class MarkdownWebView: CustomView, WKNavigationDelegate {
     @Environment(\.openURL) private var openURL
     private struct Constants {

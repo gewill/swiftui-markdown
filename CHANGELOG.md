@@ -13,6 +13,12 @@ adds on top of that baseline.
 
 ## [Unreleased]
 
+### Added
+
+- DocC documentation for the public API, with a landing page and an article on
+  bundling fonts. `.spi.yml` lets Swift Package Index build and host it ([#18]).
+
+
 ## [2.0.0] - 2026-09-16
 
 Custom font support for the Markdown preview, plus the correctness, performance
@@ -140,3 +146,4 @@ its own major versions.
 [#12]: https://github.com/gewill/swiftui-markdown/issues/12
 [#13]: https://github.com/gewill/swiftui-markdown/pull/13
 [#14]: https://github.com/gewill/swiftui-markdown/pull/14
+[#18]: https://github.com/gewill/swiftui-markdown/pull/18
