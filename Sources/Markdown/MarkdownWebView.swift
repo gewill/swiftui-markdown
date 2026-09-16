@@ -229,6 +229,25 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
         callJavascript(javascriptString: script)
     }
 
+    /// Applies whatever arrived before the page was ready. Theme and style go
+    /// first so the content is never rendered with default styling for a frame.
+    internal func flushPendingUpdates() {
+        pageLoaded = true
+
+        if let theme = pendingTheme {
+            executeSetTheme(theme)
+            pendingTheme = nil
+        }
+        if let style = pendingStyle {
+            executeSetMarkdownStyle(style)
+            pendingStyle = nil
+        }
+        if let content = pendingContent {
+            executeSetContent(content)
+            pendingContent = nil
+        }
+    }
+
     private func resetAllPaddings() {
         let script = """
         if (window.__markdown_preview__) {
@@ -413,6 +432,12 @@ extension MarkdownWebView {
         return cache
     }()
 
+    /// The cache outlives individual views, so tests that assert on encoding need
+    /// a way back to a known state.
+    internal static func clearFontCache() {
+        sourceCache.removeAllObjects()
+    }
+
     private static func cacheKey(for source: MarkdownFontSource) -> NSString {
         switch source {
         case .fileURL(let url):
@@ -565,20 +590,7 @@ extension MarkdownWebView: WKScriptMessageHandler {
 
         // is Ready
         if message.name == Constants.mdPreviewDidReady {
-            pageLoaded = true
-
-            if let theme = pendingTheme {
-                executeSetTheme(theme)
-                pendingTheme = nil
-            }
-            if let style = pendingStyle {
-                executeSetMarkdownStyle(style)
-                pendingStyle = nil
-            }
-            if let content = pendingContent {
-                executeSetContent(content)
-                pendingContent = nil
-            }
+            flushPendingUpdates()
             return
         }
 
