@@ -119,7 +119,13 @@ Markdown(content: $mdStr)
 
 #### System fonts
 
-Use CSS font-family syntax for built-in system fonts.
+Use CSS font-family syntax for built-in system fonts. Every field is optional
+on its own, so changing just the size keeps the default typeface:
+
+```swift
+Markdown(content: $mdStr)
+  .markdownStyle(MarkdownStyle(fontSize: 20))
+```
 
 ```swift
 Markdown(content: $mdStr)
@@ -179,6 +185,10 @@ MarkdownFontFace(
 )
 ```
 
+`fontWeight` and `fontStyle` describe what a face covers. Besides `.normal`,
+`.bold`, `.italic` and `.oblique` they take `.value(700)`, `.range(400, 700)`
+for a variable font, and `.obliqueAngle(14)`.
+
 For Markdown documents, provide regular, bold, italic, and bold italic faces
 when you want `**strong**`, `*emphasis*`, and `***strong emphasis***` to use
 real font files.
@@ -192,26 +202,26 @@ Markdown(content: $mdStr)
         MarkdownFontFace(
           fontFamily: "Merriweather",
           source: .appResource(name: "Merriweather-Regular", fileExtension: "ttf", bundleIdentifier: nil),
-          fontWeight: "400",
-          fontStyle: "normal"
+          fontWeight: .normal,
+          fontStyle: .normal
         ),
         MarkdownFontFace(
           fontFamily: "Merriweather",
           source: .appResource(name: "Merriweather-Bold", fileExtension: "ttf", bundleIdentifier: nil),
-          fontWeight: "700",
-          fontStyle: "normal"
+          fontWeight: .bold,
+          fontStyle: .normal
         ),
         MarkdownFontFace(
           fontFamily: "Merriweather",
           source: .appResource(name: "Merriweather-Italic", fileExtension: "ttf", bundleIdentifier: nil),
-          fontWeight: "400",
-          fontStyle: "italic"
+          fontWeight: .normal,
+          fontStyle: .italic
         ),
         MarkdownFontFace(
           fontFamily: "Merriweather",
           source: .appResource(name: "Merriweather-BoldItalic", fileExtension: "ttf", bundleIdentifier: nil),
-          fontWeight: "700",
-          fontStyle: "italic"
+          fontWeight: .bold,
+          fontStyle: .italic
         )
       ]
     )

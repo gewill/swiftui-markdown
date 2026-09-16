@@ -176,18 +176,18 @@ private enum FontDemo: String, CaseIterable, Identifiable {
         boldItalic: String
     ) -> [MarkdownFontFace] {
         [
-            fontFace(family: family, name: regular, weight: "400", style: "normal"),
-            fontFace(family: family, name: bold, weight: "700", style: "normal"),
-            fontFace(family: family, name: italic, weight: "400", style: "italic"),
-            fontFace(family: family, name: boldItalic, weight: "700", style: "italic")
+            fontFace(family: family, name: regular, weight: .normal, style: .normal),
+            fontFace(family: family, name: bold, weight: .bold, style: .normal),
+            fontFace(family: family, name: italic, weight: .normal, style: .italic),
+            fontFace(family: family, name: boldItalic, weight: .bold, style: .italic)
         ]
     }
 
     private static func fontFace(
         family: String,
         name: String,
-        weight: String,
-        style: String
+        weight: MarkdownFontWeight,
+        style: MarkdownFontStyle
     ) -> MarkdownFontFace {
         MarkdownFontFace(
             fontFamily: family,

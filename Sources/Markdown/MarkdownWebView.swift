@@ -459,11 +459,19 @@ extension MarkdownWebView {
             "src: \(source);"
         ]
 
-        if let fontWeight = sanitizedDescriptor(fontFace.fontWeight, name: "fontWeight") {
-            declarations.append("font-weight: \(fontWeight);")
+        if let fontWeight = fontFace.fontWeight {
+            if let cssValue = fontWeight.cssValue {
+                declarations.append("font-weight: \(cssValue);")
+            } else {
+                log("ignoring out-of-range font weight \(fontWeight)")
+            }
         }
-        if let fontStyle = sanitizedDescriptor(fontFace.fontStyle, name: "fontStyle") {
-            declarations.append("font-style: \(fontStyle);")
+        if let fontStyle = fontFace.fontStyle {
+            if let cssValue = fontStyle.cssValue {
+                declarations.append("font-style: \(cssValue);")
+            } else {
+                log("ignoring out-of-range font style \(fontStyle)")
+            }
         }
 
         return "@font-face { \(declarations.joined(separator: " ")) }"
@@ -553,24 +561,6 @@ extension MarkdownWebView {
 
         sourceCache.setObject(descriptor as NSString, forKey: key, cost: descriptor.utf8.count)
         return descriptor
-    }
-
-    /// `@font-face` is assembled as CSS text, so a descriptor carrying `;` or `}`
-    /// could close the rule and append rules of its own. Everything CSS actually
-    /// allows here — `normal`, `bold`, `700`, `400 700`, `oblique 14deg` — fits in
-    /// letters, digits, spaces, dots and hyphens.
-    private static func sanitizedDescriptor(_ value: String?, name: String) -> String? {
-        guard let value = value else {
-            return nil
-        }
-
-        let allowed = CharacterSet(charactersIn: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .-")
-        guard !value.isEmpty, value.unicodeScalars.allSatisfy(allowed.contains) else {
-            log("ignoring \(name) '\(value)': unexpected characters")
-            return nil
-        }
-
-        return value
     }
 
     private static func cssSingleQuoted(_ value: String) -> String {

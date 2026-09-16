@@ -51,8 +51,8 @@ final class MarkdownTests: XCTestCase {
                 MarkdownFontFace(
                     fontFamily: "DemoFont",
                     source: .fileURL(fontURL),
-                    fontWeight: "400",
-                    fontStyle: "normal"
+                    fontWeight: .normal,
+                    fontStyle: .normal
                 )
             ]
         )
@@ -62,7 +62,7 @@ final class MarkdownTests: XCTestCase {
         XCTAssertTrue(css.contains("@font-face"))
         XCTAssertTrue(css.contains("font-family: 'DemoFont';"))
         XCTAssertTrue(css.contains("src: url('data:font/ttf;base64,AAEC') format('truetype');"))
-        XCTAssertTrue(css.contains("font-weight: 400;"))
+        XCTAssertTrue(css.contains("font-weight: normal;"))
         XCTAssertTrue(css.contains("font-style: normal;"))
     }
 
@@ -82,10 +82,10 @@ final class MarkdownTests: XCTestCase {
         let style = MarkdownStyle(
             fontFamily: "'Demo Serif', Georgia, serif",
             fontFaces: [
-                MarkdownFontFace(fontFamily: "Demo Serif", source: .fileURL(fontURLs["Regular"]!), fontWeight: "400", fontStyle: "normal"),
-                MarkdownFontFace(fontFamily: "Demo Serif", source: .fileURL(fontURLs["Bold"]!), fontWeight: "700", fontStyle: "normal"),
-                MarkdownFontFace(fontFamily: "Demo Serif", source: .fileURL(fontURLs["Italic"]!), fontWeight: "400", fontStyle: "italic"),
-                MarkdownFontFace(fontFamily: "Demo Serif", source: .fileURL(fontURLs["BoldItalic"]!), fontWeight: "700", fontStyle: "italic")
+                MarkdownFontFace(fontFamily: "Demo Serif", source: .fileURL(fontURLs["Regular"]!), fontWeight: .normal, fontStyle: .normal),
+                MarkdownFontFace(fontFamily: "Demo Serif", source: .fileURL(fontURLs["Bold"]!), fontWeight: .bold, fontStyle: .normal),
+                MarkdownFontFace(fontFamily: "Demo Serif", source: .fileURL(fontURLs["Italic"]!), fontWeight: .normal, fontStyle: .italic),
+                MarkdownFontFace(fontFamily: "Demo Serif", source: .fileURL(fontURLs["BoldItalic"]!), fontWeight: .bold, fontStyle: .italic)
             ]
         )
 
@@ -93,10 +93,10 @@ final class MarkdownTests: XCTestCase {
 
         XCTAssertEqual(css.components(separatedBy: "@font-face").count - 1, 4)
         XCTAssertTrue(css.contains("--markdown-font-family: 'Demo Serif', Georgia, serif;"))
-        XCTAssertTrue(css.contains("font-weight: 400; font-style: normal;"))
-        XCTAssertTrue(css.contains("font-weight: 700; font-style: normal;"))
-        XCTAssertTrue(css.contains("font-weight: 400; font-style: italic;"))
-        XCTAssertTrue(css.contains("font-weight: 700; font-style: italic;"))
+        XCTAssertTrue(css.contains("font-weight: normal; font-style: normal;"))
+        XCTAssertTrue(css.contains("font-weight: bold; font-style: normal;"))
+        XCTAssertTrue(css.contains("font-weight: normal; font-style: italic;"))
+        XCTAssertTrue(css.contains("font-weight: bold; font-style: italic;"))
     }
 
     func testInvalidFileURLReturnsNil() throws {
@@ -107,8 +107,8 @@ final class MarkdownTests: XCTestCase {
                 MarkdownFontFace(
                     fontFamily: "RemoteFont",
                     source: .fileURL(remoteURL),
-                    fontWeight: "400",
-                    fontStyle: "normal"
+                    fontWeight: .normal,
+                    fontStyle: .normal
                 )
             ]
         )
@@ -129,8 +129,8 @@ final class MarkdownTests: XCTestCase {
                 MarkdownFontFace(
                     fontFamily: "CachedFont",
                     source: source,
-                    fontWeight: "400",
-                    fontStyle: "normal"
+                    fontWeight: .normal,
+                    fontStyle: .normal
                 )
             ]
         )
@@ -273,57 +273,69 @@ final class MarkdownTests: XCTestCase {
         }
     }
 
-    /// @font-face is built as CSS text, so a descriptor holding `;` or `}` could
-    /// close the rule and append rules of its own. Verified to work before the
-    /// sanitizer: the injected rule really did hide the page body.
-    func testFontDescriptorsCannotInjectCSS() throws {
-        let fontURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("InjectFont-\(UUID().uuidString).ttf")
-        try Data([0x00, 0x01]).write(to: fontURL)
+    /// The injection this used to guard against is now unrepresentable: the
+    /// descriptors are enums, so a value carrying `;` or `}` cannot be built at
+    /// all. What is left is a numerically invalid value, which must be dropped
+    /// rather than written into the rule for the parser to discard.
+    func testOutOfRangeFontDescriptorsAreDropped() throws {
+        let fontURL = try makeFontFile("Range")
         defer { try? FileManager.default.removeItem(at: fontURL) }
 
-        let style = MarkdownStyle(
-            fontFamily: "'Inject', sans-serif",
-            fontFaces: [MarkdownFontFace(
-                fontFamily: "Inject",
-                source: .fileURL(fontURL),
-                fontWeight: "400; } body { display: none } @font-face { font-weight: 400",
-                fontStyle: "italic"
-            )]
-        )
+        let badWeights: [MarkdownFontWeight] = [.value(0), .value(1001), .range(700, 400), .range(0, 700)]
+        for weight in badWeights {
+            let css = MarkdownWebView.css(for: styleWithFace(fontURL, weight: weight, style: nil))
+            XCTAssertTrue(css.contains("@font-face"), "the face itself should survive")
+            XCTAssertFalse(css.contains("font-weight:"), "\(weight) should have been dropped")
+        }
 
-        let css = MarkdownWebView.css(for: style)
-
-        XCTAssertEqual(css.components(separatedBy: "@font-face").count - 1, 1)
-        XCTAssertFalse(css.contains("display: none"))
-        XCTAssertFalse(css.contains("font-weight:"), "the unsafe descriptor should be dropped")
-        XCTAssertTrue(css.contains("font-style: italic;"), "the safe one should survive")
+        let badStyles: [MarkdownFontStyle] = [.obliqueAngle(91), .obliqueAngle(-91), .obliqueAngle(.nan)]
+        for style in badStyles {
+            let css = MarkdownWebView.css(for: styleWithFace(fontURL, weight: nil, style: style))
+            XCTAssertTrue(css.contains("@font-face"))
+            XCTAssertFalse(css.contains("font-style:"), "\(style) should have been dropped")
+        }
     }
 
     func testValidFontDescriptorsSurvive() throws {
-        let fontURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("ValidFont-\(UUID().uuidString).ttf")
-        try Data([0x00, 0x01]).write(to: fontURL)
+        let fontURL = try makeFontFile("Valid")
         defer { try? FileManager.default.removeItem(at: fontURL) }
 
-        // Everything CSS allows for these descriptors, including variable-font
-        // ranges and an oblique angle.
-        for (weight, fontStyle) in [("normal", "normal"), ("bold", "italic"),
-                                    ("700", "oblique 14deg"), ("400 700", "normal")] {
-            let style = MarkdownStyle(
-                fontFamily: "'Valid', sans-serif",
-                fontFaces: [MarkdownFontFace(
-                    fontFamily: "Valid",
-                    source: .fileURL(fontURL),
-                    fontWeight: weight,
-                    fontStyle: fontStyle
-                )]
-            )
+        let cases: [(MarkdownFontWeight, MarkdownFontStyle, String, String)] = [
+            (.normal, .normal, "normal", "normal"),
+            (.bold, .italic, "bold", "italic"),
+            (.value(700), .oblique, "700", "oblique"),
+            (.range(400, 700), .obliqueAngle(14), "400 700", "oblique 14deg"),
+            (.value(1), .obliqueAngle(-12.5), "1", "oblique -12.5deg")
+        ]
 
-            let css = MarkdownWebView.css(for: style)
-            XCTAssertTrue(css.contains("font-weight: \(weight);"), "dropped weight \(weight)")
-            XCTAssertTrue(css.contains("font-style: \(fontStyle);"), "dropped style \(fontStyle)")
+        for (weight, style, expectedWeight, expectedStyle) in cases {
+            let css = MarkdownWebView.css(for: styleWithFace(fontURL, weight: weight, style: style))
+            XCTAssertTrue(css.contains("font-weight: \(expectedWeight);"), "dropped \(weight)")
+            XCTAssertTrue(css.contains("font-style: \(expectedStyle);"), "dropped \(style)")
         }
+    }
+
+    private func makeFontFile(_ label: String) throws -> URL {
+        let url = FileManager.default.temporaryDirectory
+            .appendingPathComponent("\(label)Font-\(UUID().uuidString).ttf")
+        try Data([0x00, 0x01]).write(to: url)
+        return url
+    }
+
+    private func styleWithFace(
+        _ url: URL,
+        weight: MarkdownFontWeight?,
+        style: MarkdownFontStyle?
+    ) -> MarkdownStyle {
+        MarkdownStyle(
+            fontFamily: "'Probe', sans-serif",
+            fontFaces: [MarkdownFontFace(
+                fontFamily: "Probe",
+                source: .fileURL(url),
+                fontWeight: weight,
+                fontStyle: style
+            )]
+        )
     }
 
     /// A family name carrying a quote must stay inside its CSS string. Counting
@@ -460,6 +472,34 @@ final class MarkdownTests: XCTestCase {
         XCTAssertNil(webView.pendingContent)
         XCTAssertNil(webView.pendingTheme)
         XCTAssertNil(webView.pendingStyle)
+    }
+
+    // MARK: - Style initialiser
+
+    /// Changing only the size used to be impossible: fontFamily was required by
+    /// every initialiser that took font settings.
+    func testFontSizeAloneKeepsTheDefaultTypeface() throws {
+        let style = MarkdownStyle(fontSize: 20)
+
+        XCTAssertNil(style.fontFamily)
+        XCTAssertEqual(style.padding, 18, "the default padding should still apply")
+
+        let variables = MarkdownWebView.rootVariables(for: style)
+        XCTAssertEqual(variables.count, 1)
+        XCTAssertEqual(variables.first?.name, "--markdown-font-size")
+        XCTAssertEqual(variables.first?.value, "20px")
+    }
+
+    /// A per-edge value must not wipe out the default on the other edges — the
+    /// view applies padding first and each edge after it.
+    func testPerEdgePaddingLeavesTheOtherEdgesDefaulted() throws {
+        let style = MarkdownStyle(paddingTop: 10)
+
+        XCTAssertEqual(style.padding, 18)
+        XCTAssertEqual(style.paddingTop, 10)
+        XCTAssertNil(style.paddingBottom)
+        XCTAssertNil(style.paddingLeft)
+        XCTAssertNil(style.paddingRight)
     }
 
     private func makeTemporaryFontFiles(_ files: [String: Data]) throws -> [String: URL] {
