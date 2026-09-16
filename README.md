@@ -117,6 +117,109 @@ Markdown(content: $mdStr)
   .markdownStyle(MarkdownStyle(padding: 35 ))
 ```
 
+#### System fonts
+
+Use CSS font-family syntax for built-in system fonts.
+
+```swift
+Markdown(content: $mdStr)
+  .markdownStyle(
+    MarkdownStyle(
+      fontFamily: "\"Avenir Next\", -apple-system, sans-serif",
+      fontSize: 18,
+      lineHeight: 1.6,
+      codeFontFamily: "\"SF Mono\", Menlo, monospace"
+    )
+  )
+```
+
+#### App bundled fonts
+
+Fonts imported by the host app can be exposed to the Markdown WebView with
+`@font-face`. Use the same `fontFamily` name in the body font stack.
+Passing one regular face is valid; Markdown bold and italic will fall back to
+WebKit synthesis when matching faces are not provided.
+When `codeFontFamily` is not provided, inline code inherits `fontFamily` while
+fenced code blocks keep the default monospace stack, so column alignment inside
+code blocks is preserved. Set `codeFontFamily` to give both inline code and code
+blocks a separate stack.
+
+```swift
+Markdown(content: $mdStr)
+  .markdownStyle(
+    MarkdownStyle(
+      fontFamily: "'LXGW WenKai', -apple-system, sans-serif",
+      fontFaces: [
+        // Using a Bundle reference directly (e.g., .main, or .module in a Swift Package):
+        MarkdownFontFace(
+          fontFamily: "LXGW WenKai",
+          source: .bundleResource(
+            name: "LXGWWenKai-Regular",
+            fileExtension: "ttf",
+            bundle: .main
+          )
+        )
+      ]
+    )
+  )
+```
+
+Or reference a bundle by its identifier:
+
+```swift
+MarkdownFontFace(
+  fontFamily: "LXGW WenKai",
+  source: .appResource(
+    name: "LXGWWenKai-Regular",
+    fileExtension: "ttf",
+    bundleIdentifier: "com.example.AppFonts"
+  )
+)
+```
+
+For Markdown documents, provide regular, bold, italic, and bold italic faces
+when you want `**strong**`, `*emphasis*`, and `***strong emphasis***` to use
+real font files.
+
+```swift
+Markdown(content: $mdStr)
+  .markdownStyle(
+    MarkdownStyle(
+      fontFamily: "'Merriweather', Georgia, serif",
+      fontFaces: [
+        MarkdownFontFace(
+          fontFamily: "Merriweather",
+          source: .appResource(name: "Merriweather-Regular", fileExtension: "ttf", bundleIdentifier: nil),
+          fontWeight: "400",
+          fontStyle: "normal"
+        ),
+        MarkdownFontFace(
+          fontFamily: "Merriweather",
+          source: .appResource(name: "Merriweather-Bold", fileExtension: "ttf", bundleIdentifier: nil),
+          fontWeight: "700",
+          fontStyle: "normal"
+        ),
+        MarkdownFontFace(
+          fontFamily: "Merriweather",
+          source: .appResource(name: "Merriweather-Italic", fileExtension: "ttf", bundleIdentifier: nil),
+          fontWeight: "400",
+          fontStyle: "italic"
+        ),
+        MarkdownFontFace(
+          fontFamily: "Merriweather",
+          source: .appResource(name: "Merriweather-BoldItalic", fileExtension: "ttf", bundleIdentifier: nil),
+          fontWeight: "700",
+          fontStyle: "italic"
+        )
+      ]
+    )
+  )
+```
+
+The example app includes a `Fonts` page that switches between the default
+Markdown style, several named system font stacks, and app-bundled Atkinson
+Hyperlegible / Merriweather static font families copied into the app bundle.
+
 ## Configure
 
 <img width="666" alt="image" src="https://user-images.githubusercontent.com/1680273/158029436-cb6eb339-f698-4dcd-9508-acda79683aba.png">
