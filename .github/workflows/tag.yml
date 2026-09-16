@@ -1,13 +1,20 @@
 name: Create Release
 on:
   push:
-    tags: 
+    tags:
       - v*
+
+permissions:
+  contents: write
+
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Needed to resolve the previous tag for the comparison link.
+          fetch-depth: 0
 
       - run: mkdir website
 
@@ -25,34 +32,47 @@ jobs:
           output: website/CONTRIBUTORS.svg
           avatarSize: 42
 
-      - name: get tag version
-        id: tag_version
-        uses: jaywcjlove/changelog-generator@main
-
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
-          commit_message: ${{steps.tag_version.outputs.tag}} ${{ github.event.head_commit.message }}
+          commit_message: ${{ github.ref_name }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./website
-      
-      - name: Generate changelog
-        id: changelog
-        uses: jaywcjlove/changelog-generator@main
-        with:
-          filter: (^[\s]+?[R|r]elease)|(^[R|r]elease)
-          
+
+      # The release notes come from CHANGELOG.md rather than from generated
+      # commit summaries: the curated entry says why each change happened, and
+      # reading a file does not depend on a previous release existing.
+      - name: Extract release notes
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            $0 ~ "^## \\[" v "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "CHANGELOG.md has no section for $version" >&2
+            exit 1
+          fi
+
+          # Reference-style links used above are defined at the end of the file.
+          grep -E '^\[[^]]+\]: ' CHANGELOG.md >> release-notes.md
+
+          previous="$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)"
+          if [ -n "$previous" ]; then
+            printf '\n**Full diff**: https://github.com/%s/compare/%s...%s\n' \
+              "$GITHUB_REPOSITORY" "$previous" "$GITHUB_REF_NAME" >> release-notes.md
+          fi
+          printf '\n**Documentation**: https://raw.githack.com/%s/gh-pages/index.html\n' \
+            "$GITHUB_REPOSITORY" >> release-notes.md
+
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
           allowUpdates: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ steps.changelog.outputs.tag }}
-          tag: ${{ steps.changelog.outputs.tag }}
-          body: |
-            Documentation ${{ steps.changelog.outputs.tag }}: https://raw.githack.com/gewill/swiftui-markdown/${{ steps.changelog.outputs.gh-pages-short-hash }}/index.html
-            Comparing Changes: ${{ steps.changelog.outputs.compareurl }}
-
-            A curated summary of this release is in [CHANGELOG.md](https://github.com/gewill/swiftui-markdown/blob/main/CHANGELOG.md).
-
-            ${{ steps.changelog.outputs.changelog }}
+          name: ${{ github.ref_name }}
+          tag: ${{ github.ref_name }}
+          bodyFile: release-notes.md
