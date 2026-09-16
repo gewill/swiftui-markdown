@@ -13,10 +13,13 @@ adds on top of that baseline.
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-16
+
 Custom font support for the Markdown preview, plus the correctness, performance
-and API work that followed from reviewing it. The public API changes marked
-**Breaking** below mean the first release from this baseline is not a patch
-release.
+and API work that followed from reviewing it, and the renderer sync that came
+out of asking where the HTML actually comes from. Major because of the two
+public API changes marked **Breaking** below; the renderer also crossed two of
+its own major versions.
 
 ### Added
 
@@ -126,7 +129,8 @@ release.
 - `/build/` is anchored in `.gitignore`; the unanchored pattern ignored any file
   or directory with that name at any depth ([#9]).
 
-[Unreleased]: https://github.com/gewill/swiftui-markdown/compare/ccf278a...main
+[Unreleased]: https://github.com/gewill/swiftui-markdown/compare/v2.0.0...main
+[2.0.0]: https://github.com/gewill/swiftui-markdown/compare/ccf278a...v2.0.0
 [upstream sync]: https://github.com/gewill/swiftui-markdown/commit/ccf278a
 [#2]: https://github.com/gewill/swiftui-markdown/pull/2
 [#6]: https://github.com/gewill/swiftui-markdown/pull/6
