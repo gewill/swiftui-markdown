@@ -232,6 +232,20 @@ The example app includes a `Fonts` page that switches between the default
 Markdown style, several named system font stacks, and app-bundled Atkinson
 Hyperlegible / Merriweather static font families copied into the app bundle.
 
+## Documentation
+
+The public API is documented with DocC, including an article on bundling your
+own fonts. Build it locally with:
+
+```sh
+xcodebuild docbuild -scheme Markdown -destination 'generic/platform=macOS'
+```
+
+or open the package in Xcode and choose Product → Build Documentation.
+
+`.spi.yml` configures [Swift Package Index](https://swiftpackageindex.com) to
+build and host the same documentation once the package is indexed there.
+
 See [CHANGELOG.md](CHANGELOG.md) for what this fork changes on top of upstream.
 
 ## Configure
