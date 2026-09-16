@@ -69,6 +69,7 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
     internal var pendingContent: String?
     internal var pendingStyle: MarkdownStyle?
     internal var pendingTheme: ColorScheme?
+    internal private(set) var appliedFontFaces = [MarkdownFontFace]()
 
     override init(frame frameRect: CGRect) {
         super.init(frame: frameRect)
@@ -157,13 +158,65 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
             setPaddingRight(paddingRight)
         }
 
-        let css = Self.css(for: style)
+        applyRootVariables(for: style)
+        applyFontFaces(style.fontFaces)
+    }
+
+    /// Custom properties go straight onto the root element. Rewriting a <style>
+    /// sheet instead re-parses every @font-face in it and drops the already
+    /// loaded fonts, which shows up as a flash of fallback text on each change.
+    private func applyRootVariables(for style: MarkdownStyle) {
+        let assignments = Self.rootVariables(for: style)
+            .map { "style.setProperty(\(Self.javascriptStringLiteral($0.name)), \(Self.javascriptStringLiteral($0.value)));" }
+            .joined(separator: "\n            ")
+        let names = Self.rootVariableNames
+            .map(Self.javascriptStringLiteral)
+            .joined(separator: ", ")
+
         let script = """
         (function() {
-            var styleElement = document.getElementById('__markdown_custom_style__');
+            var style = document.documentElement.style;
+            [\(names)].forEach(function(name) { style.removeProperty(name); });
+            \(assignments)
+        })();
+        """
+        callJavascript(javascriptString: script)
+    }
+
+    /// Rebuilt only when the faces themselves change: the data URLs run to
+    /// megabytes, and re-assigning them makes WebKit decode every font again.
+    private func applyFontFaces(_ fontFaces: [MarkdownFontFace]) {
+        guard fontFaces != appliedFontFaces else {
+            return
+        }
+        appliedFontFaces = fontFaces
+
+        guard !fontFaces.isEmpty else {
+            injectFontFaceCSS("")
+            return
+        }
+
+        // Reading and base64-encoding the files is slow enough to drop frames on
+        // the SwiftUI update path, so keep it off the main thread.
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            let css = Self.fontFaceCSS(for: fontFaces)
+            DispatchQueue.main.async {
+                // A newer style may have landed while this was encoding.
+                guard let self = self, self.appliedFontFaces == fontFaces else {
+                    return
+                }
+                self.injectFontFaceCSS(css)
+            }
+        }
+    }
+
+    private func injectFontFaceCSS(_ css: String) {
+        let script = """
+        (function() {
+            var styleElement = document.getElementById('__markdown_font_faces__');
             if (!styleElement) {
                 styleElement = document.createElement('style');
-                styleElement.id = '__markdown_custom_style__';
+                styleElement.id = '__markdown_font_faces__';
                 document.head.appendChild(styleElement);
             }
             styleElement.textContent = \(Self.javascriptStringLiteral(css));
@@ -259,30 +312,58 @@ extension MarkdownWebView {
 }
 
 extension MarkdownWebView {
-    static func css(for style: MarkdownStyle) -> String {
-        var lines = style.fontFaces.compactMap(fontFaceCSS)
-        var rootVariables = [String]()
+    /// Every custom property the style can define, cleared before each update so
+    /// that dropping a property from the style also drops it from the page.
+    static let rootVariableNames = [
+        "--markdown-font-family",
+        "--markdown-font-size",
+        "--markdown-line-height",
+        "--markdown-code-font-family",
+        "--markdown-inline-code-font-family"
+    ]
+
+    static func rootVariables(for style: MarkdownStyle) -> [(name: String, value: String)] {
+        var variables = [(name: String, value: String)]()
 
         if let fontFamily = style.fontFamily {
-            rootVariables.append("--markdown-font-family: \(fontFamily);")
+            variables.append((name: "--markdown-font-family", value: fontFamily))
         }
         if let fontSize = style.fontSize {
-            rootVariables.append("--markdown-font-size: \(fontSize)px;")
+            variables.append((name: "--markdown-font-size", value: "\(fontSize)px"))
         }
         if let lineHeight = style.lineHeight {
-            rootVariables.append("--markdown-line-height: \(lineHeight);")
+            variables.append((name: "--markdown-line-height", value: "\(lineHeight)"))
         }
         if let codeFontFamily = style.codeFontFamily {
-            rootVariables.append("--markdown-code-font-family: \(codeFontFamily);")
-            rootVariables.append("--markdown-inline-code-font-family: \(codeFontFamily);")
+            variables.append((name: "--markdown-code-font-family", value: codeFontFamily))
+            variables.append((name: "--markdown-inline-code-font-family", value: codeFontFamily))
         } else if let fontFamily = style.fontFamily {
             // Only inline code inherits the body font. Fenced code blocks keep the
             // monospace stack from marked.css so column alignment survives.
-            rootVariables.append("--markdown-inline-code-font-family: \(fontFamily);")
+            variables.append((name: "--markdown-inline-code-font-family", value: fontFamily))
         }
 
-        if !rootVariables.isEmpty {
-            lines.append(":root { \(rootVariables.joined(separator: " ")) }")
+        return variables
+    }
+
+    static func fontFaceCSS(for fontFaces: [MarkdownFontFace]) -> String {
+        fontFaces.compactMap(fontFaceCSS).joined(separator: "\n")
+    }
+
+    /// The two halves combined into one sheet. The view injects them separately;
+    /// this is what a page would look like with everything applied at once.
+    static func css(for style: MarkdownStyle) -> String {
+        var lines = [String]()
+
+        let faces = fontFaceCSS(for: style.fontFaces)
+        if !faces.isEmpty {
+            lines.append(faces)
+        }
+
+        let variables = rootVariables(for: style)
+        if !variables.isEmpty {
+            let declarations = variables.map { "\($0.name): \($0.value);" }.joined(separator: " ")
+            lines.append(":root { \(declarations) }")
         }
 
         return lines.joined(separator: "\n")
@@ -298,17 +379,34 @@ extension MarkdownWebView {
         return String(json.dropFirst().dropLast())
     }
 
-    private static var dataURLCache = [MarkdownFontSource: String]()
-    private static let cacheQueue = DispatchQueue(label: "com.markdown.fontcache")
+    /// Encoded faces are held in a bounded cache: a four-face family runs to
+    /// roughly 1.5 MB of base64, which used to be retained for the process
+    /// lifetime with no way to reclaim it.
+    private static let sourceCache: NSCache<NSString, NSString> = {
+        let cache = NSCache<NSString, NSString>()
+        cache.totalCostLimit = 32 * 1024 * 1024
+        return cache
+    }()
+
+    private static func cacheKey(for source: MarkdownFontSource) -> NSString {
+        switch source {
+        case .fileURL(let url):
+            return "file|\(url.absoluteString)" as NSString
+        case .appResource(let name, let fileExtension, let bundleIdentifier):
+            return "app|\(bundleIdentifier ?? "")|\(name)|\(fileExtension ?? "")" as NSString
+        case .bundleResource(let name, let fileExtension, let bundle):
+            return "bundle|\(bundle.bundleURL.absoluteString)|\(name)|\(fileExtension ?? "")" as NSString
+        }
+    }
 
     private static func fontFaceCSS(_ fontFace: MarkdownFontFace) -> String? {
-        guard let dataURL = dataURL(for: fontFace.source) else {
+        guard let source = fontSource(for: fontFace.source) else {
             return nil
         }
 
         var declarations = [
             "font-family: '\(cssSingleQuoted(fontFace.fontFamily))';",
-            "src: url('\(dataURL)');"
+            "src: \(source);"
         ]
 
         if let fontWeight = fontFace.fontWeight {
@@ -356,13 +454,12 @@ extension MarkdownWebView {
         #endif
     }
 
-    private static func dataURL(for source: MarkdownFontSource) -> String? {
-        var cached: String?
-        cacheQueue.sync {
-            cached = dataURLCache[source]
-        }
-        if let cached = cached {
-            return cached
+    /// Returns a ready-to-use `src` descriptor, e.g.
+    /// `url('data:font/ttf;base64,...') format('truetype')`.
+    private static func fontSource(for source: MarkdownFontSource) -> String? {
+        let key = cacheKey(for: source)
+        if let cached = sourceCache.object(forKey: key) {
+            return cached as String
         }
 
         guard let url = url(for: source) else {
@@ -384,24 +481,28 @@ extension MarkdownWebView {
         }
 
         let mimeType: String
+        let format: String?
         switch url.pathExtension.lowercased() {
         case "otf":
-            mimeType = "font/otf"
+            (mimeType, format) = ("font/otf", "opentype")
         case "ttf":
-            mimeType = "font/ttf"
+            (mimeType, format) = ("font/ttf", "truetype")
         case "woff":
-            mimeType = "font/woff"
+            (mimeType, format) = ("font/woff", "woff")
         case "woff2":
-            mimeType = "font/woff2"
+            (mimeType, format) = ("font/woff2", "woff2")
         default:
-            mimeType = "application/octet-stream"
+            // Let WebKit sniff an unknown extension rather than claim a format.
+            (mimeType, format) = ("application/octet-stream", nil)
         }
 
-        let dataURL = "data:\(mimeType);base64,\(data.base64EncodedString())"
-        cacheQueue.sync {
-            dataURLCache[source] = dataURL
+        var descriptor = "url('data:\(mimeType);base64,\(data.base64EncodedString())')"
+        if let format = format {
+            descriptor += " format('\(format)')"
         }
-        return dataURL
+
+        sourceCache.setObject(descriptor as NSString, forKey: key, cost: descriptor.utf8.count)
+        return descriptor
     }
 
     private static func cssSingleQuoted(_ value: String) -> String {
