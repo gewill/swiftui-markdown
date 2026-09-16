@@ -1,6 +1,6 @@
 //
 //  SwiftUIView.swift
-//  
+//
 //
 //  Created by 王楚江 on 2022/3/10.
 //
@@ -20,10 +20,10 @@ import WebKit
 // JS Func
 typealias JavascriptCallback = (Result<Any?, Error>) -> Void
 private struct JavascriptFunction {
-    
+
     let functionString: String
     let callback: JavascriptCallback?
-    
+
     init(functionString: String, callback: JavascriptCallback? = nil) {
         self.functionString = functionString
         self.callback = callback
@@ -52,40 +52,40 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
             webView.isInspectable = true
         }
         #endif
-        
+
         #if os(OSX)
         webView.setValue(true, forKey: "drawsTransparentBackground") // Prevent white flick
         #elseif os(iOS)
         webView.isOpaque = false
         #endif
-        
+
         return webView
     }()
-    
+
     var textDidChanged: ((String) -> Void)?
-    
+
     internal var pageLoaded = false
     private var currentContent: String = ""
     internal var pendingContent: String?
     internal var pendingStyle: MarkdownStyle?
     internal var pendingTheme: ColorScheme?
-    
+
     override init(frame frameRect: CGRect) {
         super.init(frame: frameRect)
         initWebView()
     }
-    
+
     required init?(coder: NSCoder) {
         super.init(coder: coder)
         initWebView()
     }
-    
+
     func setContent(_ value: String) {
         guard currentContent != value else {
             return
         }
         currentContent = value
-        
+
         if pageLoaded {
             executeSetContent(value)
         } else {
@@ -121,7 +121,7 @@ public class MarkdownWebView: CustomView, WKNavigationDelegate {
         \(value)
         """.replacingOccurrences(of: "`", with: "\\`", options: .literal, range: nil)
             .replacingOccurrences(of: "{", with: "\\{", options: .literal, range: nil)
-        
+
         let end = "`; markdownPreview(content.replace(/\\\\`/g, '`').replace(/\\\\{/g, '{'));"
 
         let script = first + content + end
@@ -226,13 +226,13 @@ extension MarkdownWebView {
         webview.trailingAnchor.constraint(equalTo: trailingAnchor).isActive = true
         webview.topAnchor.constraint(equalTo: topAnchor).isActive = true
         webview.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
-        
+
         guard let bundlePath = Bundle.module.path(forResource: "web", ofType: "bundle"),
             let bundle = Bundle(path: bundlePath),
             let indexPath = bundle.path(forResource: "index", ofType: "html") else {
                 fatalError("Ace editor is missing")
         }
-        
+
         let data = try! Data(contentsOf: URL(fileURLWithPath: indexPath))
         webview.load(data, mimeType: "text/html", characterEncodingName: "utf-8", baseURL: bundle.resourceURL!)
     }
@@ -392,7 +392,7 @@ extension MarkdownWebView: WKScriptMessageHandler {
         // is Ready
         if message.name == Constants.mdPreviewDidReady {
             pageLoaded = true
-            
+
             if let theme = pendingTheme {
                 executeSetTheme(theme)
                 pendingTheme = nil
@@ -407,11 +407,11 @@ extension MarkdownWebView: WKScriptMessageHandler {
             }
             return
         }
-        
+
         // is Text change
         if message.name == Constants.mdPreviewDidChanged,
            let text = message.body as? String {
-            
+
             self.textDidChanged?(text)
 
             return

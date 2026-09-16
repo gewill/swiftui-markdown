@@ -111,7 +111,7 @@ final class MarkdownTests: XCTestCase {
         let fontURL = FileManager.default.temporaryDirectory.appendingPathComponent("CachedFont-\(UUID().uuidString).ttf")
         try Data([0x0A, 0x0B, 0x0C]).write(to: fontURL)
         defer { try? FileManager.default.removeItem(at: fontURL) }
-        
+
         let source = MarkdownFontSource.fileURL(fontURL)
         let style = MarkdownStyle(
             fontFamily: "'CachedFont', sans-serif",
@@ -124,14 +124,14 @@ final class MarkdownTests: XCTestCase {
                 )
             ]
         )
-        
+
         // 1. First execution creates cached entry
         let css1 = MarkdownWebView.css(for: style)
         XCTAssertTrue(css1.contains("src: url('data:font/ttf;base64,CgsM');"))
-        
+
         // 2. Delete the physical file
         try FileManager.default.removeItem(at: fontURL)
-        
+
         // 3. Second execution should succeed from cache despite the file being missing
         let css2 = MarkdownWebView.css(for: style)
         XCTAssertTrue(css2.contains("src: url('data:font/ttf;base64,CgsM');"))
