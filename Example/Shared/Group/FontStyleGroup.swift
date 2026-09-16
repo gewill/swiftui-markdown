@@ -193,7 +193,7 @@ private enum FontDemo: String, CaseIterable, Identifiable {
             fontFamily: family,
             source: .appResource(
                 name: name,
-                fileExtension: "ttf",
+                fileExtension: "woff2",
                 bundleIdentifier: nil
             ),
             fontWeight: weight,

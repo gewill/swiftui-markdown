@@ -3,6 +3,11 @@ import SwiftUI
 @testable import Markdown
 
 final class MarkdownTests: XCTestCase {
+    override func setUp() {
+        super.setUp()
+        MarkdownWebView.clearFontCache()
+    }
+
     func testStyleBuildsSystemFontCSS() throws {
         let style = MarkdownStyle(
             fontFamily: "\"Avenir Next\", -apple-system, sans-serif",
@@ -35,7 +40,8 @@ final class MarkdownTests: XCTestCase {
     }
 
     func testStyleBuildsAppFontFaceDataURL() throws {
-        let fontURL = FileManager.default.temporaryDirectory.appendingPathComponent("MarkdownTestFont.ttf")
+        let fontURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("MarkdownTestFont-\(UUID().uuidString).ttf")
         try Data([0x00, 0x01, 0x02]).write(to: fontURL)
         defer { try? FileManager.default.removeItem(at: fontURL) }
 
@@ -141,7 +147,7 @@ final class MarkdownTests: XCTestCase {
         XCTAssertTrue(css2.contains("src: url('data:font/ttf;base64,CgsM') format('truetype');"))
     }
 
-    func testBundleResourceLoading() throws {
+    func testMissingBundleResourceProducesNoFontFace() throws {
         let source = MarkdownFontSource.bundleResource(name: "NonExistentFont", fileExtension: "ttf", bundle: Bundle.main)
         let style = MarkdownStyle(
             fontFamily: "'BundleFont', sans-serif",
@@ -342,6 +348,118 @@ final class MarkdownTests: XCTestCase {
 
         XCTAssertTrue(css.contains(#"font-family: 'Quote\';"#), "the quote should be escaped")
         XCTAssertFalse(css.contains(#"font-family: 'Quote';"#), "the string must not be closed early")
+    }
+
+    // MARK: - JavaScript escaping
+
+    /// This is the only thing standing between a Markdown style and arbitrary
+    /// JavaScript, since the CSS it escapes is interpolated into an evaluated
+    /// script. It had no tests at all.
+    func testJavascriptStringLiteralEscaping() throws {
+        let cases: [(input: String, mustContain: [String], mustNotContain: [String])] = [
+            (#"plain"#, [#""plain""#], []),
+            (#"with "quotes""#, [#"\""#], []),
+            (#"back\slash"#, [#"\\"#], []),
+            ("new\nline", [#"\n"#], ["\n"]),
+            ("tab\there", [#"\t"#], ["\t"]),
+            (#"'); alert(1); ('"#, [#"\'); alert(1); ('"#.replacingOccurrences(of: #"\"#, with: "")], [])
+        ]
+
+        for testCase in cases {
+            let literal = MarkdownWebView.javascriptStringLiteral(testCase.input)
+            XCTAssertTrue(literal.hasPrefix("\""), "not quoted: \(literal)")
+            XCTAssertTrue(literal.hasSuffix("\""), "not quoted: \(literal)")
+            for fragment in testCase.mustContain {
+                XCTAssertTrue(literal.contains(fragment), "\(literal) is missing \(fragment)")
+            }
+            for fragment in testCase.mustNotContain {
+                XCTAssertFalse(literal.contains(fragment), "\(literal) still holds a raw \(fragment)")
+            }
+        }
+    }
+
+    /// A literal that closed its own string would let the surrounding script run
+    /// anything. The escaped form must never contain an unescaped quote.
+    func testJavascriptStringLiteralCannotCloseItsOwnString() throws {
+        let hostile = #"a"; document.body.remove(); var x = ""#
+        let literal = MarkdownWebView.javascriptStringLiteral(hostile)
+
+        let body = literal.dropFirst().dropLast()
+        var previousWasBackslash = false
+        for character in body {
+            if character == "\"" {
+                XCTAssertTrue(previousWasBackslash, "unescaped quote in \(literal)")
+            }
+            previousWasBackslash = (character == "\\") && !previousWasBackslash
+        }
+    }
+
+    // MARK: - Reverting to the default style
+
+    func testDefaultStyleProducesEmptyCSS() throws {
+        let css = MarkdownWebView.css(for: MarkdownStyle(padding: 18))
+
+        XCTAssertTrue(css.isEmpty, "a padding-only style should not emit any CSS")
+        XCTAssertTrue(MarkdownWebView.rootVariables(for: MarkdownStyle(padding: 18)).isEmpty)
+    }
+
+    /// Going back to a style without fonts has to drop the faces, otherwise the
+    /// previous family stays installed on the page.
+    func testSwitchingBackToDefaultDropsFontFaces() throws {
+        let fontURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("RevertFont-\(UUID().uuidString).ttf")
+        try Data([0x00, 0x01]).write(to: fontURL)
+        defer { try? FileManager.default.removeItem(at: fontURL) }
+
+        let webView = MarkdownWebView(frame: .zero)
+        webView.flushPendingUpdates()
+        XCTAssertTrue(webView.appliedFontFaces.isEmpty)
+
+        let faces = [MarkdownFontFace(fontFamily: "Revert", source: .fileURL(fontURL))]
+        webView.setMarkdownStyle(MarkdownStyle(fontFamily: "'Revert', sans-serif", fontFaces: faces))
+        XCTAssertEqual(webView.appliedFontFaces, faces)
+
+        webView.setMarkdownStyle(MarkdownStyle(padding: 18))
+        XCTAssertTrue(webView.appliedFontFaces.isEmpty, "faces should be cleared on revert")
+    }
+
+    // MARK: - Replaying queued updates
+
+    /// Theme and style must be replayed before the content, or the first frame
+    /// renders with default styling.
+    func testFlushAppliesAndClearsEveryQueuedUpdate() throws {
+        let webView = MarkdownWebView(frame: .zero)
+        let style = MarkdownStyle(padding: 42)
+
+        webView.setTheme(.dark)
+        webView.setMarkdownStyle(style)
+        webView.setContent("queued")
+
+        XCTAssertFalse(webView.pageLoaded)
+        XCTAssertEqual(webView.pendingTheme, .dark)
+        XCTAssertEqual(webView.pendingStyle, style)
+        XCTAssertEqual(webView.pendingContent, "queued")
+
+        webView.flushPendingUpdates()
+
+        XCTAssertTrue(webView.pageLoaded)
+        XCTAssertNil(webView.pendingTheme)
+        XCTAssertNil(webView.pendingStyle)
+        XCTAssertNil(webView.pendingContent)
+    }
+
+    /// After the flush, updates must go straight out instead of queueing again.
+    func testUpdatesAfterFlushAreNotQueued() throws {
+        let webView = MarkdownWebView(frame: .zero)
+        webView.flushPendingUpdates()
+
+        webView.setContent("live")
+        webView.setTheme(.dark)
+        webView.setMarkdownStyle(MarkdownStyle(padding: 7))
+
+        XCTAssertNil(webView.pendingContent)
+        XCTAssertNil(webView.pendingTheme)
+        XCTAssertNil(webView.pendingStyle)
     }
 
     private func makeTemporaryFontFiles(_ files: [String: Data]) throws -> [String: URL] {
