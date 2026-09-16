@@ -13,7 +13,7 @@ struct MarkdownStyleGroup: View {
         .markdownStyle()
         ===
 
-        Render Markdown text in SwiftUI. It is a preview based on the [`Marked`](https://github.com/markedjs/marked) implementation.
+        Render Markdown text in SwiftUI. The preview is rendered by [`@wcj/markdown-to-html`](https://github.com/jaywcjlove/markdown-to-html), which is built on unified/remark/rehype.
         
         ## Usage
         

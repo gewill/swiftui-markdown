@@ -15,7 +15,7 @@ struct BaseMarkdownGroup: View {
         [![CI](https://github.com/jaywcjlove/markdown/actions/workflows/ci.yml/badge.svg)](https://github.com/jaywcjlove/markdown/actions/workflows/ci.yml)
         ![SwiftUI Support](https://shields.io/badge/SwiftUI-macOS%20v10.15%20%7C%20iOS%20v13-green?logo=Swift&style=flat)
 
-        Render Markdown text in SwiftUI. It is a preview based on the [`Marked`](https://github.com/markedjs/marked) implementation.
+        Render Markdown text in SwiftUI. The preview is rendered by [`@wcj/markdown-to-html`](https://github.com/jaywcjlove/markdown-to-html), which is built on unified/remark/rehype.
 
         ## Installation
 
