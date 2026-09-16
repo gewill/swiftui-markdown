@@ -1,0 +1,114 @@
+# Changelog
+
+All notable changes to this fork are documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+This file starts at the last upstream sync, [`ccf278a`][upstream sync]
+(2026-05-28). Version 1.1.0 and everything before it belong to
+[jaywcjlove/swiftui-markdown](https://github.com/jaywcjlove/swiftui-markdown);
+see that repository for their history. Entries below are the changes this fork
+adds on top of that baseline.
+
+## [Unreleased]
+
+Custom font support for the Markdown preview, plus the correctness, performance
+and API work that followed from reviewing it. The public API changes marked
+**Breaking** below mean the first release from this baseline is not a patch
+release.
+
+### Added
+
+- Font configuration on `MarkdownStyle`: `fontFamily`, `fontSize`, `lineHeight`
+  and `codeFontFamily`. Every field is optional on its own, so changing only the
+  size keeps the default typeface ([#2], [#10]).
+- `MarkdownFontFace` and `MarkdownFontSource` for loading a face from a file URL,
+  an app resource, or an explicit `Bundle`. Faces are injected as `@font-face`
+  rules carrying a base64 data URL, so the WebView never reads across bundles
+  ([#2]).
+- Style changes made through `.markdownStyle(_:)` now reach a live WebView.
+  Previously they only applied when the view was created ([#2]).
+- A Fonts page in the example app covering system stacks and the bundled
+  Atkinson Hyperlegible and Merriweather four-face families ([#2]).
+- Continuous integration: the test suite plus the macOS and iOS example builds
+  run on every pull request. The only previous workflow rendered the README into
+  a site on pushes to `main`, so nothing ran the tests ([#2]).
+
+### Changed
+
+- **Breaking.** `MarkdownFontFace` takes `MarkdownFontWeight` and
+  `MarkdownFontStyle` instead of `String?`. They cover what `@font-face`
+  accepts — `.normal`, `.bold`, `.value(700)`, `.range(400, 700)`, `.italic`,
+  `.oblique`, `.obliqueAngle(14)` — and a value CSS would reject is dropped with
+  a log rather than written into the rule. Migration: `fontWeight: "700"` becomes
+  `.bold` or `.value(700)`, `fontStyle: "italic"` becomes `.italic` ([#10]).
+- **Breaking.** `MarkdownStyle` has one initialiser instead of five. Three of the
+  old ones differed only in which padding arguments they accepted, and the two
+  that took font settings required `fontFamily`. Padding behaviour is unchanged:
+  per-edge values apply over `padding`, so passing only `paddingTop` leaves the
+  other three edges at the default. Call sites that pass only padding, or a full
+  font configuration, compile unchanged ([#10]).
+- Custom properties are written directly to `documentElement.style`, and
+  `@font-face` rules live in their own element that is rebuilt only when the
+  faces change, with the encoding done off the main thread. Previously every
+  style change rewrote a single sheet holding both: for the four-face
+  Merriweather family that meant re-sending and re-parsing 1.4 MB, which dropped
+  every loaded font back to `unloaded` — changing only the font size flashed
+  fallback text. A style update now ships 201 bytes instead of 1.5 MB, and
+  escaping it on the main thread went from 9.6 ms to 0.08 ms ([#6]).
+- Encoded faces are held in a bounded `NSCache` instead of a static dictionary
+  that was never reclaimed ([#6]).
+- `@font-face` declares `format()`, inferred from the file extension and omitted
+  for unknown ones so WebKit can still sniff them ([#6]).
+- The example ships its fonts as woff2: 1.3 MB of TrueType became 398 KB, and
+  the OFL texts are in the built app, which previously shipped the fonts without
+  the license the OFL asks to accompany them ([#9]).
+
+### Fixed
+
+- Fenced code blocks keep their monospace stack when only `fontFamily` is set.
+  A single custom property fed both inline code and code blocks, so setting a
+  body typeface turned code blocks into it and destroyed column alignment.
+  Inline code still inherits the body font ([#2]).
+- An `appResource` whose `bundleIdentifier` does not resolve drops the face
+  instead of quietly searching the main bundle, where it could pick up an
+  unrelated font with the same name. The missing-resource and unreadable-file
+  paths log in debug builds ([#2]).
+- The preview recovers when the web content process is terminated. The view kept
+  believing the page was live, so every later update was dropped and the preview
+  stayed blank until the view was recreated ([#8]).
+- `@font-face` descriptors can no longer inject CSS. The rule is assembled as
+  text, so a `font-weight` or `font-style` carrying `;` or `}` could close it and
+  append rules of its own. Restricted in [#8] and made unrepresentable by the
+  typed descriptors in [#10]. Family names were already safe: the escaped value
+  parses as a single font name ([#8], [#10]).
+- Calls issued before the page is ready are no longer silently discarded from
+  paths that could reach them: the padding helpers are private, since they are
+  only ever driven at the right time ([#8]).
+
+### Removed
+
+- `doc/custom-font-development-plan.md`, a progress table with every row marked
+  done ([#9]).
+
+### Internal
+
+- Test coverage went from 8 to 23 cases. `javascriptStringLiteral` — the only
+  thing between a Markdown style and arbitrary JavaScript, since the CSS it
+  escapes is interpolated into an evaluated script — had none; its new cases were
+  checked against a deliberately broken version of it. Reverting to the default
+  style, the replay of updates queued before the page is ready, and the numeric
+  bounds of the font descriptors are covered too ([#9], [#10]).
+- The encoded-font cache can be reset, so a test asserting on encoding no longer
+  reads an entry left by an earlier run ([#9]).
+- `/build/` is anchored in `.gitignore`; the unanchored pattern ignored any file
+  or directory with that name at any depth ([#9]).
+
+[Unreleased]: https://github.com/gewill/swiftui-markdown/compare/ccf278a...main
+[upstream sync]: https://github.com/gewill/swiftui-markdown/commit/ccf278a
+[#2]: https://github.com/gewill/swiftui-markdown/pull/2
+[#6]: https://github.com/gewill/swiftui-markdown/pull/6
+[#8]: https://github.com/gewill/swiftui-markdown/pull/8
+[#9]: https://github.com/gewill/swiftui-markdown/pull/9
+[#10]: https://github.com/gewill/swiftui-markdown/pull/10
