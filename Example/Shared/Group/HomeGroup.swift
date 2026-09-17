@@ -17,7 +17,7 @@ struct HomeGroup: View {
 
         Render Markdown text in SwiftUI. The preview is rendered by [`@wcj/markdown-to-html`](https://github.com/jaywcjlove/markdown-to-html), which is built on unified/remark/rehype.
 
-        ![Markdown Package Screenshot](https://user-images.githubusercontent.com/1680273/158006647-19d180e2-2549-4cd4-b108-91778beccc1b.png)
+        ![A bundled font, Merriweather, in light and dark mode](https://github.com/user-attachments/assets/df7aaac6-4120-47e0-9c4a-dbeed3936197)
 
         ## Installation
 

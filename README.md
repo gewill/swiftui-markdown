@@ -7,13 +7,15 @@ SwiftUI Markdown
 
 Render Markdown text in SwiftUI. The preview is rendered by [`@wcj/markdown-to-html`](https://github.com/jaywcjlove/markdown-to-html), which is built on unified/remark/rehype.
 
-https://user-images.githubusercontent.com/1680273/159059803-d844769b-36ad-44c1-a296-a657de8d099c.mov
+https://github.com/user-attachments/assets/63d0cfda-68f5-4aad-8ce4-a55fcfee036a
 
-![Markdown Package Screenshot](https://user-images.githubusercontent.com/1680273/158006647-19d180e2-2549-4cd4-b108-91778beccc1b.png)
+<p align="center">
+  <img alt="A bundled font, Merriweather, in light and dark mode" src="https://github.com/user-attachments/assets/df7aaac6-4120-47e0-9c4a-dbeed3936197" width="600">
+</p>
 
-![Markdown Package Screenshot](https://user-images.githubusercontent.com/1680273/158075575-14c9c942-5b99-479c-9935-b631bac3828e.png)
-
-![Markdown Package Screenshot](https://user-images.githubusercontent.com/1680273/158075581-925d267f-47ce-4468-b891-0fb2467b89df.png)
+<p align="center">
+  <img alt="Syntax highlighting in dark mode and KaTeX in light mode" src="https://github.com/user-attachments/assets/d0bb0ac7-70a6-4ae6-9963-371757d3b9d0" width="600">
+</p>
 
 ## Installation
 
