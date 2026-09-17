@@ -19,9 +19,11 @@ struct KaTeXGroup: View {
         `KaTeX:a''`
         ```
         
-        ```markdown
-        \\\\`\\\\`\\\\`KaTeX
+        ````markdown
+        ```KaTeX
+        c = \\pm\\sqrt{a^2 + b^2}
         ```
+        ````
         
         ## Example
         
@@ -52,7 +54,7 @@ struct KaTeXGroup: View {
         `\\dot{a}` | `KaTeX:\\dot{a}` | `\\overleftrightarrow{AB}` | `KaTeX:\\overleftrightarrow{AB}` | `\\overbrace{AB}` | `KaTeX:\\overbrace{AB}`
         `\\ddot{a}` | `KaTeX:\\ddot{a}` | `\\underleftrightarrow{AB}` | `KaTeX:\\underleftrightarrow{AB}` | `\\underbrace{AB}` | `KaTeX:\\underbrace{AB}`
         `\\grave{a}` | `KaTeX:\\grave{a}` | `\\overline{AB}` | `KaTeX:\\overline{AB}` | `\\overlinesegment{AB}` | `KaTeX:\\overlinesegment{AB}`
-        `\\hat{\theta}` | `KaTeX:\\hat{\theta}` | `\\underline{AB}` | `KaTeX:\\underline{AB}` | `\\underlinesegment{AB}` | `KaTeX:\\underlinesegment{AB}`
+        `\\hat{\\theta}` | `KaTeX:\\hat{\\theta}` | `\\underline{AB}` | `KaTeX:\\underline{AB}` | `\\underlinesegment{AB}` | `KaTeX:\\underlinesegment{AB}`
         `\\widehat{ac}` | `KaTeX:\\widehat{ac}` | `\\widecheck{ac}` | `KaTeX:\\widecheck{ac}` | `\\underbar{X}` | `KaTeX:\\underbar{X}`
         
         
