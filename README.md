@@ -14,7 +14,7 @@ https://github.com/user-attachments/assets/63d0cfda-68f5-4aad-8ce4-a55fcfee036a
 </p>
 
 <p align="center">
-  <img alt="Syntax highlighting in dark mode and KaTeX in light mode" src="https://github.com/user-attachments/assets/d0bb0ac7-70a6-4ae6-9963-371757d3b9d0" width="600">
+  <img alt="Syntax highlighting in dark mode and KaTeX in light mode" src="https://github.com/user-attachments/assets/007e8815-53eb-462b-b75b-26853cc52975" width="600">
 </p>
 
 ## Installation

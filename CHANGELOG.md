@@ -13,6 +13,15 @@ adds on top of that baseline.
 
 ## [Unreleased]
 
+### Fixed
+
+- The example's KaTeX page shows the syntax of a formula block and renders
+  `\hat{\theta}`. The syntax block printed stray backslashes, which are not
+  escapes inside a code block; it now nests the fence in a four-backtick one.
+  `\theta` reached the renderer as a tab followed by `heta`, since Swift reads
+  `\t` in a string literal as an escape. The README screenshot of the page is
+  retaken ([#24]).
+
 ## [2.0.1] - 2026-09-17
 
 Fixes the box that 2.0.0 drew behind the preview, and adds documentation for
@@ -197,3 +206,4 @@ its own major versions.
 [#20]: https://github.com/gewill/swiftui-markdown/pull/20
 [#21]: https://github.com/gewill/swiftui-markdown/pull/21
 [#22]: https://github.com/gewill/swiftui-markdown/pull/22
+[#24]: https://github.com/gewill/swiftui-markdown/pull/24
