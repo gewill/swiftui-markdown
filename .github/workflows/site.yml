@@ -1,11 +1,15 @@
-name: CI
+name: Deploy Site
+
 on:
   push:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
-  Build:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -26,14 +30,11 @@ jobs:
           output: website/CONTRIBUTORS.svg
           avatarSize: 42
 
-      - name: get tag version
-        id: tag_version
-        uses: jaywcjlove/changelog-generator@main
-
+      # The only publisher of the gh-pages branch. Release tags are cut from
+      # main after this has run, so they have nothing newer to publish.
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
-          commit_message: ${{steps.tag_version.outputs.tag}} ${{ github.event.head_commit.message }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./website
           user_name: 'github-actions[bot]'

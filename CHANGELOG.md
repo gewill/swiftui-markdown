@@ -28,6 +28,25 @@ adds on top of that baseline.
   visionOS 1. The example pages carried copies of the same badges and URL
   ([#19]).
 
+### Fixed
+
+- Links to `markdownStyle(_:)` in the documentation resolve. They named the
+  `SwiftUI` module, but `View` lives in `SwiftUICore` in current SDKs, so all
+  four rendered as plain text. The build that produced them reported no
+  problems only because DocC was reusing cached output ([#20]).
+
+### Internal
+
+- Documentation is built on every pull request with warnings as errors, so a
+  link that stops resolving fails CI ([#20]).
+- The site workflow no longer asks GitHub for the latest release. It did so only
+  to word a commit message, and failed on every push to `main` until the first
+  release existed. It is renamed from "CI" to "Deploy Site", since the tests
+  live in their own workflow ([#20]).
+- Only the site workflow publishes the gh-pages branch; the release workflow
+  duplicated that build and now only creates the release, linking to the
+  documentation on Swift Package Index ([#20]).
+
 
 ## [2.0.0] - 2026-09-16
 
@@ -158,3 +177,4 @@ its own major versions.
 [#14]: https://github.com/gewill/swiftui-markdown/pull/14
 [#18]: https://github.com/gewill/swiftui-markdown/pull/18
 [#19]: https://github.com/gewill/swiftui-markdown/pull/19
+[#20]: https://github.com/gewill/swiftui-markdown/pull/20

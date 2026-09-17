@@ -35,3 +35,12 @@ jobs:
             -sdk iphonesimulator \
             -destination 'generic/platform=iOS Simulator' \
             CODE_SIGNING_ALLOWED=NO
+
+      # Warnings are errors, so a symbol link that stops resolving fails here
+      # instead of rendering as plain text in the published documentation.
+      - name: Build documentation
+        run: |
+          xcodebuild docbuild -quiet \
+            -scheme Markdown \
+            -destination 'generic/platform=macOS' \
+            OTHER_DOCC_FLAGS=--warnings-as-errors

@@ -40,7 +40,7 @@ VStack {
 ### Styling
 
 Padding and typography come from ``MarkdownStyle``. Apply one with
-``SwiftUI/View/markdownStyle(_:)``; every field stands on its own, so changing
+``SwiftUICore/View/markdownStyle(_:)``; every field stands on its own, so changing
 a single thing leaves the rest at its default.
 
 ```swift
@@ -69,7 +69,7 @@ The preview follows the environment's colour scheme. To pin it, pass one to
 ### Essentials
 
 - ``Markdown/Markdown``
-- ``SwiftUI/View/markdownStyle(_:)``
+- ``SwiftUICore/View/markdownStyle(_:)``
 
 ### Styling
 

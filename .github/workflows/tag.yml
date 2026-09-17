@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 jobs:
-  build-deploy:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v6
@@ -17,29 +17,6 @@ jobs:
           # depth alone leaves the checkout without the other tags.
           fetch-depth: 0
           fetch-tags: true
-
-      - run: mkdir website
-
-      - name: Converts Markdown to HTML
-        uses: jaywcjlove/markdown-to-html-cli@main
-        with:
-          output: website/index.html
-          github-corners: https://github.com/gewill/swiftui-markdown
-          favicon: https://forums.developer.apple.com/forums/build-02092022-2/public/assets/favicon.ico
-
-      - name: Generate Contributors Images
-        uses: jaywcjlove/github-action-contributors@main
-        with:
-          filter-author: (renovate\[bot\]|renovate-bot|dependabot\[bot\])
-          output: website/CONTRIBUTORS.svg
-          avatarSize: 42
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          commit_message: ${{ github.ref_name }}
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./website
 
       # The release notes come from CHANGELOG.md rather than from generated
       # commit summaries: the curated entry says why each change happened, and
@@ -69,7 +46,7 @@ jobs:
           else
             echo "::warning::no earlier tag reachable from $GITHUB_REF_NAME; omitting the comparison link"
           fi
-          printf '\n**Documentation**: https://raw.githack.com/%s/gh-pages/index.html\n' \
+          printf '\n**Documentation**: https://swiftpackageindex.com/%s/documentation/markdown\n' \
             "$GITHUB_REPOSITORY" >> release-notes.md
 
       - name: Create Release

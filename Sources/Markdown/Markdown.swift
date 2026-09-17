@@ -30,7 +30,7 @@ import WebKit
 /// `TextEditor`, say — updates the preview as you type.
 ///
 /// Padding and typography come from ``MarkdownStyle``, applied with
-/// ``SwiftUI/View/markdownStyle(_:)``. Light and dark follow the environment's
+/// ``SwiftUICore/View/markdownStyle(_:)``. Light and dark follow the environment's
 /// colour scheme unless you pass one to ``init(content:theme:)``.
 ///
 /// Links are opened with the environment's `openURL` action rather than
