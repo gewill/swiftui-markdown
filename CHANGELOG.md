@@ -27,6 +27,14 @@ adds on top of that baseline.
   macOS 10.15 and iOS 13, where the package requires macOS 11, iOS 14 and
   visionOS 1. The example pages carried copies of the same badges and URL
   ([#19]).
+- Reshoot the README's video and screenshots. They dated from 2022 and showed
+  the old renderer text, the upstream package URL and the old platforms, with
+  none of the font support. The video now switches fonts and appearance in a
+  running preview. The media is uploaded as attachments rather than committed,
+  since SwiftPM clones the whole repository for every package that depends on
+  it. The contributors image, which pointed at a GitHub Pages site this
+  repository has never had and so never loaded, now comes from the gh-pages
+  branch ([#22]).
 
 ### Fixed
 
@@ -184,3 +192,4 @@ its own major versions.
 [#19]: https://github.com/gewill/swiftui-markdown/pull/19
 [#20]: https://github.com/gewill/swiftui-markdown/pull/20
 [#21]: https://github.com/gewill/swiftui-markdown/pull/21
+[#22]: https://github.com/gewill/swiftui-markdown/pull/22

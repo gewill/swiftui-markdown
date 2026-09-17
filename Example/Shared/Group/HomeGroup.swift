@@ -17,7 +17,7 @@ struct HomeGroup: View {
 
         Render Markdown text in SwiftUI. The preview is rendered by [`@wcj/markdown-to-html`](https://github.com/jaywcjlove/markdown-to-html), which is built on unified/remark/rehype.
 
-        ![Markdown Package Screenshot](https://user-images.githubusercontent.com/1680273/158006647-19d180e2-2549-4cd4-b108-91778beccc1b.png)
+        ![A bundled font, Merriweather, in light and dark mode](https://github.com/user-attachments/assets/df7aaac6-4120-47e0-9c4a-dbeed3936197)
 
         ## Installation
 
@@ -30,7 +30,7 @@ struct HomeGroup: View {
         Or add the following to `Package.swift`:
 
         ```swift
-        .package(url: "https://github.com/sindresorhus/is-camera-on", from: "1.0.0")
+        .package(url: "https://github.com/gewill/swiftui-markdown", from: "2.0.0")
         ```
 
         Or [add the package in Xcode](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
