@@ -18,6 +18,13 @@
     cursor: default;
 }
 
+/* The web view is transparent so the host app's background shows through.
+   marked.css 3.x paints its own canvas colour on .markdown-body, which draws
+   a box that stops where the content ends. */
+.markdown-body {
+  background-color: transparent;
+}
+
 .markdown-body pre .copied {
   visibility: hidden;
   display: flex;

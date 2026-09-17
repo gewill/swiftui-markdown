@@ -30,6 +30,11 @@ adds on top of that baseline.
 
 ### Fixed
 
+- The preview is transparent again, so the host app's background shows through.
+  The stylesheet synced in 2.0.0 paints `.markdown-body` with its own canvas
+  colour, which drew a box that stopped where the content ended: dark grey on
+  black in iOS dark mode, and white on a grey window in macOS light mode
+  ([#21]).
 - Links to `markdownStyle(_:)` in the documentation resolve. They named the
   `SwiftUI` module, but `View` lives in `SwiftUICore` in current SDKs, so all
   four rendered as plain text. The build that produced them reported no
@@ -178,3 +183,4 @@ its own major versions.
 [#18]: https://github.com/gewill/swiftui-markdown/pull/18
 [#19]: https://github.com/gewill/swiftui-markdown/pull/19
 [#20]: https://github.com/gewill/swiftui-markdown/pull/20
+[#21]: https://github.com/gewill/swiftui-markdown/pull/21
