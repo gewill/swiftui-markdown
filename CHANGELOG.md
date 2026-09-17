@@ -13,6 +13,12 @@ adds on top of that baseline.
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-09-17
+
+Fixes the box that 2.0.0 drew behind the preview, and adds documentation for
+the public API, hosted on Swift Package Index. A patch release: the public API
+is unchanged, and the Swift sources gain only documentation comments.
+
 ### Added
 
 - DocC documentation for the public API, with a landing page and an article on
@@ -59,7 +65,6 @@ adds on top of that baseline.
 - Only the site workflow publishes the gh-pages branch; the release workflow
   duplicated that build and now only creates the release, linking to the
   documentation on Swift Package Index ([#20]).
-
 
 ## [2.0.0] - 2026-09-16
 
@@ -115,7 +120,6 @@ its own major versions.
 - The example ships its fonts as woff2: 1.3 MB of TrueType became 398 KB, and
   the OFL texts are in the built app, which previously shipped the fonts without
   the license the OFL asks to accompany them ([#9]).
-
 - Sync the bundled renderer, `@wcj/markdown-to-html`, from 1.0.0 (2022) to 3.0.6.
   Its public surface is unchanged — `markdown.default()`, `getCodeString()` and
   the `rewrite` option all behave the same — and the minified bundle drops from
@@ -152,7 +156,6 @@ its own major versions.
 - Calls issued before the page is ready are no longer silently discarded from
   paths that could reach them: the padding helpers are private, since they are
   only ever driven at the right time ([#8]).
-
 - Name the renderer correctly. The preview has always been rendered by
   `@wcj/markdown-to-html`, built on unified/remark/rehype, not by
   [marked](https://github.com/markedjs/marked); `marked.css` is github-markdown-css
@@ -177,7 +180,8 @@ its own major versions.
 - `/build/` is anchored in `.gitignore`; the unanchored pattern ignored any file
   or directory with that name at any depth ([#9]).
 
-[Unreleased]: https://github.com/gewill/swiftui-markdown/compare/v2.0.0...main
+[Unreleased]: https://github.com/gewill/swiftui-markdown/compare/v2.0.1...main
+[2.0.1]: https://github.com/gewill/swiftui-markdown/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/gewill/swiftui-markdown/compare/ccf278a...v2.0.0
 [upstream sync]: https://github.com/gewill/swiftui-markdown/commit/ccf278a
 [#2]: https://github.com/gewill/swiftui-markdown/pull/2
