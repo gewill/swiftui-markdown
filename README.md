@@ -201,14 +201,22 @@ See [CHANGELOG.md](CHANGELOG.md) for what this fork changes on top of upstream.
 
 ## Configure
 
-<img width="666" alt="image" src="https://user-images.githubusercontent.com/1680273/158029436-cb6eb339-f698-4dcd-9508-acda79683aba.png">
+In a sandboxed macOS app, the preview's web view needs outgoing network
+connections. Select the macOS target in Xcode, open **Signing & Capabilities**,
+and under **App Sandbox** enable **Outgoing Connections (Client)**, or add the
+entitlement directly:
+
+```xml
+<key>com.apple.security.network.client</key>
+<true/>
+```
 
 ## Contributors
 
 As always, thanks to our amazing contributors!
 
 <a href="https://github.com/gewill/swiftui-markdown/graphs/contributors">
-  <img src="https://gewill.github.io/swiftui-markdown/CONTRIBUTORS.svg" />
+  <img src="https://raw.githubusercontent.com/gewill/swiftui-markdown/gh-pages/CONTRIBUTORS.svg" />
 </a>
 
 Made with [contributors](https://github.com/jaywcjlove/github-action-contributors).

@@ -24,7 +24,7 @@ struct DemoList: View {
             Spacer()
             #if os(macOS)
             Button(action: {
-                openURL(URL(string: "https://jaywcjlove.github.io/markdown")!)
+                openURL(URL(string: "https://swiftpackageindex.com/gewill/swiftui-markdown")!)
             }, label: {
                 Image(systemName: "network")
                     .resizable() // 它将调整大小，以便填充所有可用空间

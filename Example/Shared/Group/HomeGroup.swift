@@ -30,7 +30,7 @@ struct HomeGroup: View {
         Or add the following to `Package.swift`:
 
         ```swift
-        .package(url: "https://github.com/sindresorhus/is-camera-on", from: "1.0.0")
+        .package(url: "https://github.com/gewill/swiftui-markdown", from: "2.0.0")
         ```
 
         Or [add the package in Xcode](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
