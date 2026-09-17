@@ -104,7 +104,7 @@ public struct MarkdownFontFace: Hashable {
 
 /// Padding, typography and bundled fonts for a Markdown preview.
 ///
-/// Apply one with ``SwiftUI/View/markdownStyle(_:)``. Every field stands on its
+/// Apply one with ``SwiftUICore/View/markdownStyle(_:)``. Every field stands on its
 /// own, so changing a single thing leaves the rest at its default:
 ///
 /// ```swift
