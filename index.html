@@ -105,22 +105,12 @@ svg { z-index: 99; position: fixed; border: 0px; top: 0px; right: 0; }
       <a href="https://swiftpackageindex.com/gewill/swiftui-markdown"><img src="https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fgewill%2Fswiftui-markdown%2Fbadge%3Ftype%3Dplatforms" alt="Platforms"></a>
     </p>
     <p>Render Markdown text in SwiftUI. The preview is rendered by <a href="https://github.com/jaywcjlove/markdown-to-html"><code>@wcj/markdown-to-html</code></a>, which is built on unified/remark/rehype.</p>
-    <details open class="octicon octicon-video">
-      <summary>
-        <svg aria-hidden height="16" width="16" viewBox="0 0 16 16" version="1.1" data-view-component class="octicon octicon-device-camera-video">
-          <path fill-rule="evenodd" d="M16 3.75a.75.75 0 00-1.136-.643L11 5.425V4.75A1.75 1.75 0 009.25 3h-7.5A1.75 1.75 0 000 4.75v6.5C0 12.216.784 13 1.75 13h7.5A1.75 1.75 0 0011 11.25v-.675l3.864 2.318A.75.75 0 0016 12.25v-8.5zm-5 5.075l3.5 2.1v-5.85l-3.5 2.1v1.65zM9.5 6.75v-2a.25.25 0 00-.25-.25h-7.5a.25.25 0 00-.25.25v6.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-4.5z"></path>
-        </svg><span aria-label="Video description 159059803-d844769b-36ad-44c1-a296-a657de8d099c.mov">159059803-d844769b-36ad-44c1-a296-a657de8d099c.mov</span><span class="dropdown-caret"></span>
-      </summary>
-      <video muted controls style="max-height:640px;" src="https://user-images.githubusercontent.com/1680273/159059803-d844769b-36ad-44c1-a296-a657de8d099c.mov"></video>
-    </details>
-    <p>
-      <img src="https://user-images.githubusercontent.com/1680273/158006647-19d180e2-2549-4cd4-b108-91778beccc1b.png" alt="Markdown Package Screenshot">
+    <p><a href="https://github.com/user-attachments/assets/63d0cfda-68f5-4aad-8ce4-a55fcfee036a">https://github.com/user-attachments/assets/63d0cfda-68f5-4aad-8ce4-a55fcfee036a</a></p>
+    <p align="center">
+      <img alt="A bundled font, Merriweather, in light and dark mode" src="https://github.com/user-attachments/assets/df7aaac6-4120-47e0-9c4a-dbeed3936197" width="600">
     </p>
-    <p>
-      <img src="https://user-images.githubusercontent.com/1680273/158075575-14c9c942-5b99-479c-9935-b631bac3828e.png" alt="Markdown Package Screenshot">
-    </p>
-    <p>
-      <img src="https://user-images.githubusercontent.com/1680273/158075581-925d267f-47ce-4468-b891-0fb2467b89df.png" alt="Markdown Package Screenshot">
+    <p align="center">
+      <img alt="Syntax highlighting in dark mode and KaTeX in light mode" src="https://github.com/user-attachments/assets/d0bb0ac7-70a6-4ae6-9963-371757d3b9d0" width="600">
     </p>
     <h2 id="installation"><a class="anchor" aria-hidden="true" tabindex="-1" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
     <p>You can add this package to an Xcode project as a package dependency.</p>
@@ -377,9 +367,19 @@ struct ContentView: View {
 " class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
     <p>See <a href="CHANGELOG.md">CHANGELOG.md</a> for what this fork changes on top of upstream.</p>
     <h2 id="configure"><a class="anchor" aria-hidden="true" tabindex="-1" href="#configure"><span class="octicon octicon-link"></span></a>Configure</h2>
-    <img width="666" alt="image" src="https://user-images.githubusercontent.com/1680273/158029436-cb6eb339-f698-4dcd-9508-acda79683aba.png">
+    <p>
+      In a sandboxed macOS app, the preview's web view needs outgoing network
+      connections. Select the macOS target in Xcode, open <strong>Signing &#x26; Capabilities</strong>,
+      and under <strong>App Sandbox</strong> enable <strong>Outgoing Connections (Client)</strong>, or add the
+      entitlement directly:
+    </p>
+    <pre class="language-xml"><code class="language-xml code-highlight"><span class="code-line line-number" line="1"><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>key</span><span class="token punctuation">></span></span>com.apple.security.network.client<span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;/</span>key</span><span class="token punctuation">></span></span>
+</span><span class="code-line line-number" line="2"><span class="token tag"><span class="token tag"><span class="token punctuation">&#x3C;</span>true</span><span class="token punctuation">/></span></span>
+</span></code><div onclick="copied(this)" data-code="<key>com.apple.security.network.client</key>
+<true/>
+" class="copied"><svg class="octicon-copy" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 010 1.5h-1.5a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-1.5a.75.75 0 011.5 0v1.5A1.75 1.75 0 019.25 16h-7.5A1.75 1.75 0 010 14.25v-7.5z"></path><path fill-rule="evenodd" d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0114.25 11h-7.5A1.75 1.75 0 015 9.25v-7.5zm1.75-.25a.25.25 0 00-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 00.25-.25v-7.5a.25.25 0 00-.25-.25h-7.5z"></path></svg><svg class="octicon-check" aria-hidden="true" viewBox="0 0 16 16" fill="currentColor" height="12" width="12"><path fill-rule="evenodd" d="M13.78 4.22a.75.75 0 010 1.06l-7.25 7.25a.75.75 0 01-1.06 0L2.22 9.28a.75.75 0 011.06-1.06L6 10.94l6.72-6.72a.75.75 0 011.06 0z"></path></svg></div></pre>
     <h2 id="contributors"><a class="anchor" aria-hidden="true" tabindex="-1" href="#contributors"><span class="octicon octicon-link"></span></a>Contributors</h2>
-    <p>As always, thanks to our amazing contributors!</p><a href="https://github.com/gewill/swiftui-markdown/graphs/contributors"><img src="https://gewill.github.io/swiftui-markdown/CONTRIBUTORS.svg"></a>
+    <p>As always, thanks to our amazing contributors!</p><a href="https://github.com/gewill/swiftui-markdown/graphs/contributors"><img src="https://raw.githubusercontent.com/gewill/swiftui-markdown/gh-pages/CONTRIBUTORS.svg"></a>
     <p>Made with <a href="https://github.com/jaywcjlove/github-action-contributors">contributors</a>.</p>
     <h2 id="license"><a class="anchor" aria-hidden="true" tabindex="-1" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
     <p>Licensed under the MIT License.</p>
